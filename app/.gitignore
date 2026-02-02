@@ -1,0 +1,7 @@
+/build
+
+# Google Services (Firebase - SENSITIVE!)
+google-services.json
+
+# Local test configuration
+*.local
