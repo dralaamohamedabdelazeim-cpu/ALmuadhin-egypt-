@@ -25,6 +25,7 @@ data class HomeUiState(
     val error: String? = null,
     val settings: UserSettings = UserSettings(),
     val day: PrayerDay? = null,
+    val selectedDateDay: PrayerDay? = null, // Prayer times for selected date in calendar
     val nextPrayerName: String? = null,
     val nextPrayerTime: String? = null,
     val countdown: String? = null,
@@ -202,6 +203,33 @@ class HomeViewModel @Inject constructor(
                         prayerRepo.fetchAndCacheWeekByCity(s.manualCity, s.manualCountry, s.calculationMethod)
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Fetch prayer times for a specific date (for calendar view)
+     */
+    fun fetchPrayerTimesForDate(date: LocalDate) {
+        viewModelScope.launch {
+            val s = settingsRepo.settingsFlow.first()
+            val dateStr = date.format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+            
+            runCatching {
+                val day = if (s.locationMode == LocationMode.AUTO) {
+                    val loc = locationRepo.getLastKnownLocation()
+                    if (loc != null) {
+                        prayerRepo.getPrayerDayByCoordinates(dateStr, loc.latitude, loc.longitude, s.calculationMethod)
+                    } else {
+                        prayerRepo.getPrayerDayByCity(dateStr, s.manualCity, s.manualCountry, s.calculationMethod)
+                    }
+                } else {
+                    prayerRepo.getPrayerDayByCity(dateStr, s.manualCity, s.manualCountry, s.calculationMethod)
+                }
+                _state.value = _state.value.copy(selectedDateDay = day)
+            }.onFailure {
+                // If we can't get data for the date, use today's data as fallback
+                _state.value = _state.value.copy(selectedDateDay = _state.value.day)
             }
         }
     }

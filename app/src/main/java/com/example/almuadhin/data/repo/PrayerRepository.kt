@@ -136,7 +136,7 @@ class PrayerRepository @Inject constructor(
     }
 
     /**
-     * Fetch and cache prayer times for the next 7 days by city
+     * Fetch and cache prayer times for the next 7 days using Calendar API (single request)
      */
     suspend fun fetchAndCacheWeekByCity(
         city: String,
@@ -144,18 +144,69 @@ class PrayerRepository @Inject constructor(
         method: CalculationMethod
     ): List<PrayerDay> = withContext(Dispatchers.IO) {
         val today = LocalDate.now()
-        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
         val results = mutableListOf<PrayerDay>()
         
-        for (i in 0 until CACHE_DAYS) {
-            val date = today.plusDays(i.toLong())
-            val dateStr = date.format(formatter)
+        try {
+            // Fetch current month calendar (single API call)
+            val currentMonthCalendar = api.getCalendarByCity(
+                year = today.year,
+                month = today.monthValue,
+                city = city,
+                country = country,
+                method = method.apiId
+            )
             
-            try {
-                val prayerDay = getPrayerDayByCity(dateStr, city, country, method)
-                results.add(prayerDay)
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to fetch day $i: ${e.message}")
+            // If we're near end of month, also fetch next month
+            val nextMonthCalendar = if (today.dayOfMonth > 24) {
+                val nextMonth = today.plusMonths(1)
+                api.getCalendarByCity(
+                    year = nextMonth.year,
+                    month = nextMonth.monthValue,
+                    city = city,
+                    country = country,
+                    method = method.apiId
+                )
+            } else null
+            
+            // Combine and filter days for the week
+            val allDays = currentMonthCalendar.data + (nextMonthCalendar?.data ?: emptyList())
+            
+            for (i in 0 until CACHE_DAYS) {
+                val targetDate = today.plusDays(i.toLong())
+                val targetDateStr = targetDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                
+                // Find matching day in calendar response
+                val dayData = allDays.find { calendarDay ->
+                    calendarDay.date.gregorian?.date == targetDateStr ||
+                    calendarDay.date.readable.contains("${targetDate.dayOfMonth} ")
+                }
+                
+                if (dayData != null) {
+                    val prayerDay = calendarDayToPrayerDay(dayData)
+                    results.add(prayerDay)
+                    
+                    // Cache the result
+                    val dateKey = targetDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                    prayerDao.insertPrayerDay(PrayerDayEntity.fromPrayerDay(dateKey, prayerDay))
+                    Log.d(TAG, "Cached calendar data for $dateKey")
+                }
+            }
+            
+            Log.d(TAG, "Successfully fetched and cached ${results.size} days from calendar API")
+            
+        } catch (e: Exception) {
+            Log.e(TAG, "Calendar API error, falling back to individual requests: ${e.message}")
+            // Fallback to individual requests if calendar fails
+            val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+            for (i in 0 until CACHE_DAYS) {
+                val date = today.plusDays(i.toLong())
+                val dateStr = date.format(formatter)
+                try {
+                    val prayerDay = getPrayerDayByCity(dateStr, city, country, method)
+                    results.add(prayerDay)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to fetch day $i: ${e.message}")
+                }
             }
         }
         
@@ -165,6 +216,7 @@ class PrayerRepository @Inject constructor(
         
         results
     }
+
 
     /**
      * Get cached prayer times for a date range
@@ -209,6 +261,36 @@ class PrayerRepository @Inject constructor(
             gregorianDate = data.date.readable,
             hijriDate = formattedHijriDate,
             hijriMonthNumber = data.date.hijri.month.number
+        )
+    }
+
+    /**
+     * Convert CalendarDayData to PrayerDay
+     */
+    private fun calendarDayToPrayerDay(dayData: com.example.almuadhin.data.remote.CalendarDayData): PrayerDay {
+        val t = dayData.timings
+        val hijri = dayData.date.hijri
+        
+        // Convert to Arabic numerals
+        val arabicDay = convertToArabicNumerals(hijri.day)
+        val arabicYear = convertToArabicNumerals(hijri.year)
+        val monthName = hijri.month.ar
+        
+        // Format: ٤ شعبان ١٤٤٧هـ
+        val formattedHijriDate = "$arabicDay $monthName $arabicYear" + "هـ"
+        
+        return PrayerDay(
+            imsak = TimeUtils.normalizeTime(t.imsak),
+            fajr = TimeUtils.normalizeTime(t.fajr),
+            sunrise = TimeUtils.normalizeTime(t.sunrise),
+            dhuhr = TimeUtils.normalizeTime(t.dhuhr),
+            asr = TimeUtils.normalizeTime(t.asr),
+            maghrib = TimeUtils.normalizeTime(t.maghrib),
+            isha = TimeUtils.normalizeTime(t.isha),
+            timezone = dayData.meta.timezone,
+            gregorianDate = dayData.date.readable,
+            hijriDate = formattedHijriDate,
+            hijriMonthNumber = hijri.month.number
         )
     }
     

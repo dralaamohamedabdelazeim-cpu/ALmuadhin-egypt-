@@ -22,4 +22,24 @@ interface AladhanApi {
         @Query("country") country: String,
         @Query("method") method: Int
     ): AladhanResponse
+
+    // Calendar endpoint - returns entire month in one request
+    @GET("v1/calendarByCity/{year}/{month}")
+    suspend fun getCalendarByCity(
+        @Path("year") year: Int,
+        @Path("month") month: Int,
+        @Query("city") city: String,
+        @Query("country") country: String,
+        @Query("method") method: Int
+    ): CalendarResponse
+
+    @GET("v1/calendar/{year}/{month}")
+    suspend fun getCalendarByCoordinates(
+        @Path("year") year: Int,
+        @Path("month") month: Int,
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double,
+        @Query("method") method: Int
+    ): CalendarResponse
 }
+

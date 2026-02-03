@@ -74,6 +74,11 @@ fun CalendarScreen(
     var selectedDate by remember { mutableStateOf(today) }
     var currentMonth by remember { mutableStateOf(today.withDayOfMonth(1)) }
 
+    // Fetch prayer times when selected date changes
+    LaunchedEffect(selectedDate) {
+        vm.fetchPrayerTimesForDate(selectedDate)
+    }
+
     // Calculate days for current month view
     val daysInMonth = remember(currentMonth) {
         val firstDay = currentMonth
@@ -346,7 +351,8 @@ fun CalendarScreen(
                             HorizontalDivider(color = Color(0xFF10171A).copy(alpha = 0.2f))
 
                             // Prayer Times List
-                             if (state.day != null) {
+                            val prayerDay = state.selectedDateDay ?: state.day
+                            if (prayerDay != null) {
                                 Text(
                                     "مواقيت الصلاة",
                                     style = MaterialTheme.typography.titleMedium,
@@ -354,20 +360,18 @@ fun CalendarScreen(
                                     color = Color(0xFF10171A)
                                 )
 
-                                state.day?.let { day ->
-                                    val prayers = listOf(
-                                        "الفجر" to day.fajr,
-                                        "الشروق" to day.sunrise,
-                                        "الظهر" to day.dhuhr,
-                                        "العصر" to day.asr,
-                                        "المغرب" to day.maghrib,
-                                        "العشاء" to day.isha
-                                    )
-                                    
-                                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                        prayers.forEach { (name, time) ->
-                                            PrayerTimeRow(name, time)
-                                        }
+                                val prayers = listOf(
+                                    "الفجر" to prayerDay.fajr,
+                                    "الشروق" to prayerDay.sunrise,
+                                    "الظهر" to prayerDay.dhuhr,
+                                    "العصر" to prayerDay.asr,
+                                    "المغرب" to prayerDay.maghrib,
+                                    "العشاء" to prayerDay.isha
+                                )
+                                
+                                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    prayers.forEach { (name, time) ->
+                                        PrayerTimeRow(name, time)
                                     }
                                 }
                             }

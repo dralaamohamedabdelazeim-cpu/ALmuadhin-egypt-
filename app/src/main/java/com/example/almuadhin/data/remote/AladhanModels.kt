@@ -26,7 +26,20 @@ data class Timings(
 
 data class AladhanDate(
     val readable: String,
-    val hijri: Hijri
+    val hijri: Hijri,
+    val gregorian: Gregorian? = null
+)
+
+data class Gregorian(
+    val date: String,
+    val day: String,
+    val month: GregorianMonth? = null,
+    val year: String
+)
+
+data class GregorianMonth(
+    val number: Int,
+    val en: String
 )
 
 data class Hijri(
@@ -46,3 +59,14 @@ data class Meta(
     val timezone: String
 )
 
+// Calendar Response - returns entire month
+data class CalendarResponse(
+    val code: Int,
+    val data: List<CalendarDayData>
+)
+
+data class CalendarDayData(
+    val timings: Timings,
+    val date: AladhanDate,
+    val meta: Meta
+)
