@@ -44,6 +44,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import kotlin.math.min
 import kotlinx.coroutines.delay
+import com.example.almuadhin.ui.theme.AppColors
 
 @Composable
 fun HomeScreen(
@@ -74,14 +75,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(contentPadding)
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFFDFBF5),
-                        Color(0xFFFFFCF4)
-                    )
-                )
-            )
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
             modifier = Modifier
@@ -105,7 +99,7 @@ fun HomeScreen(
                             "مواقيت الصلاة",
                             style = MaterialTheme.typography.displaySmall,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF10171A)
+                            color = MaterialTheme.colorScheme.onBackground
                         )
 
                         // App Icon (Increased size)
@@ -133,7 +127,7 @@ fun HomeScreen(
                                     day.hijriDate,
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = Color(0xFF10171A)
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                                 
                                 // Day Name (e.g., الأحد)
@@ -151,7 +145,7 @@ fun HomeScreen(
                                     arabicDayName,
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = Color(0xFF10171A)
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                             }
                         }
@@ -161,14 +155,14 @@ fun HomeScreen(
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 8.dp),
                         thickness = 1.dp,
-                        color = Color(0xFF10171A).copy(alpha = 0.1f)
+                        color = MaterialTheme.colorScheme.outlineVariant
                     )
 
                     // Row 3: Azkar Carousel with light background
                     if (spotlightList.isNotEmpty()) {
                         ElevatedCard(
                             colors = CardDefaults.elevatedCardColors(
-                                containerColor = Color(0xFFF7F4F0).copy(alpha = 0.95f)
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
                             ),
                             shape = RoundedCornerShape(20.dp),
                             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
@@ -186,7 +180,7 @@ fun HomeScreen(
                         // Fallback
                         ElevatedCard(
                             colors = CardDefaults.elevatedCardColors(
-                                containerColor = Color(0xFFFFFDF8).copy(alpha = 0.85f)
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
                             ),
                             shape = RoundedCornerShape(20.dp),
                             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
@@ -201,14 +195,14 @@ fun HomeScreen(
                                  Icon(
                                     if (isMorning) Icons.Default.WbSunny else Icons.Default.NightsStay,
                                     contentDescription = null,
-                                    tint = Color(0xFFD4AF37),
+                                    tint = Color(0xFFD4C4B0),
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     spotlightTitle,
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -223,8 +217,8 @@ fun HomeScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(4.dp)),
-                        color = Color(0xFF202429),
-                        trackColor = Color(0xFF202429).copy(alpha = 0.2f)
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                     )
                 }
             }
@@ -407,7 +401,7 @@ fun HomeScreen(
             item {
                 ElevatedCard(
                     colors = CardDefaults.elevatedCardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
+                        containerColor = MaterialTheme.colorScheme.surface
                     ),
                     shape = RoundedCornerShape(20.dp)
                 ) {
@@ -419,7 +413,7 @@ fun HomeScreen(
                             "مواقيت اليوم",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF10171A),
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
@@ -444,7 +438,7 @@ fun HomeScreen(
                             if (index < prayers.size - 1) {
                                 HorizontalDivider(
                                     modifier = Modifier.padding(vertical = 4.dp),
-                                    color = Color(0xFF10171A).copy(alpha = 0.1f)
+                                    color = MaterialTheme.colorScheme.outlineVariant
                                 )
                             }
                         }
@@ -501,7 +495,7 @@ fun AzkarCarouselHeader(azkarList: List<ZikrItem>, isMorning: Boolean, title: St
             Icon(
                 if (isMorning) Icons.Default.WbSunny else Icons.Default.NightsStay,
                 contentDescription = null,
-                tint = Color(0xFFD4AF37),
+                tint = Color(0xFFD4C4B0),
                 modifier = Modifier.size(28.dp)
             )
             
@@ -511,7 +505,7 @@ fun AzkarCarouselHeader(azkarList: List<ZikrItem>, isMorning: Boolean, title: St
                 title,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF10171A)
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -535,7 +529,7 @@ fun AzkarCarouselHeader(azkarList: List<ZikrItem>, isMorning: Boolean, title: St
                 Text(
                     text = azkarList[page].text,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurface,
                     lineHeight = 28.sp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.SemiBold
@@ -564,7 +558,7 @@ private fun PrayerTimeRow(
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(
-                if (isNext) Color(0xFF10171A).copy(alpha = 0.15f)
+                if (isNext) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                 else Color.Transparent
             )
             .padding(horizontal = 12.dp, vertical = 10.dp),
@@ -578,7 +572,7 @@ private fun PrayerTimeRow(
             Icon(
                 icon,
                 contentDescription = null,
-                tint = if (isNext) Color(0xFF10171A) else Color(0xFF10171A).copy(alpha = 0.6f),
+                tint = if (isNext) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 modifier = Modifier.size(20.dp)
             )
             Text(
@@ -588,7 +582,7 @@ private fun PrayerTimeRow(
             )
             if (isNext) {
                 Surface(
-                    color = Color(0xFF10171A),
+                    color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(4.dp)
                 ) {
                     Text(
@@ -604,7 +598,7 @@ private fun PrayerTimeRow(
             time,
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
-            color = if (isNext) Color(0xFF10171A) else Color(0xFF10171A)
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

@@ -117,14 +117,7 @@ fun CalendarScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(contentPadding)
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFFDFBF5),
-                        Color(0xFFFFFCF4)
-                    )
-                )
-            )
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -143,7 +136,7 @@ fun CalendarScreen(
                         "التقويم الهجري",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF10171A)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     val todayHijri = approximateHijriDate(today)
@@ -172,7 +165,7 @@ fun CalendarScreen(
             item {
                 ElevatedCard(
                     colors = CardDefaults.elevatedCardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
+                        containerColor = MaterialTheme.colorScheme.surface
                     ),
                     shape = RoundedCornerShape(24.dp),
                     elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
@@ -195,7 +188,7 @@ fun CalendarScreen(
                                     "${GREGORIAN_MONTHS.getOrElse(currentMonth.monthValue - 1) { "" }} ${currentMonth.year}",
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF10171A)
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 val monthHijri = approximateHijriDate(currentMonth)
                                 Text(
@@ -224,7 +217,7 @@ fun CalendarScreen(
                                     textAlign = TextAlign.Center,
                                     style = MaterialTheme.typography.bodySmall,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF10171A)
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -263,7 +256,7 @@ fun CalendarScreen(
                     Text(
                         "عرض سريع للأسبوع",
                         style = MaterialTheme.typography.titleSmall,
-                        color = Color(0xFF10171A),
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(start = 8.dp)
                     )
                     
@@ -287,7 +280,7 @@ fun CalendarScreen(
                 AnimatedVisibility(visible = state.day != null) {
                     ElevatedCard(
                         colors = CardDefaults.elevatedCardColors(
-                            containerColor = Color(0xFFFDFBF5)
+                            containerColor = MaterialTheme.colorScheme.surface
                         ),
                         shape = RoundedCornerShape(24.dp),
                          elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
@@ -307,7 +300,7 @@ fun CalendarScreen(
                                         ARABIC_DAYS.getOrElse(selectedDate.dayOfWeek.value % 7) { "" },
                                         style = MaterialTheme.typography.headlineSmall,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF10171A)
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                     Text(
                                         "${selectedDate.dayOfMonth} ${GREGORIAN_MONTHS.getOrElse(selectedDate.monthValue - 1) { "" }} ${selectedDate.year}",
@@ -318,7 +311,7 @@ fun CalendarScreen(
                                     Text(
                                         "${selectedHijri.first} ${HIJRI_MONTHS.getOrElse(selectedHijri.second - 1) { "" }} ${selectedHijri.third}هـ",
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = Color(0xFF10171A)
+                                        color = MaterialTheme.colorScheme.onSurface
                                     )
                                 }
                                 
@@ -335,20 +328,20 @@ fun CalendarScreen(
                                             locationText,
                                             style = MaterialTheme.typography.titleSmall,
                                             fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF10171A)
+                                            color = MaterialTheme.colorScheme.onSurface
                                         )
                                         Spacer(Modifier.width(4.dp))
                                         Icon(
                                             Icons.Default.LocationOn,
                                             contentDescription = null,
-                                            tint = Color(0xFF10171A),
+                                            tint = MaterialTheme.colorScheme.onSurface,
                                             modifier = Modifier.size(16.dp)
                                         )
                                     }
                                 }
                             }
 
-                            HorizontalDivider(color = Color(0xFF10171A).copy(alpha = 0.2f))
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                             // Prayer Times List
                             val prayerDay = state.selectedDateDay ?: state.day
@@ -357,7 +350,7 @@ fun CalendarScreen(
                                     "مواقيت الصلاة",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF10171A)
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
 
                                 val prayers = listOf(
@@ -385,9 +378,9 @@ fun CalendarScreen(
                                     },
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = Color(0xFF10171A)
+                                        contentColor = MaterialTheme.colorScheme.onSurface
                                     ),
-                                    border = BorderStroke(1.dp, Color(0xFF10171A).copy(alpha = 0.5f))
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                                 ) {
                                     Icon(Icons.Default.Today, contentDescription = null, modifier = Modifier.size(18.dp))
                                     Spacer(Modifier.width(8.dp))
@@ -409,14 +402,14 @@ private fun WeekDayCard(
     onClick: () -> Unit
 ) {
     val bgColor = when {
-        day.isToday -> Color(0xFF10171A)
-        isSelected -> Color(0xFF10171A).copy(alpha = 0.15f)
-        else -> Color.White
+        day.isToday -> MaterialTheme.colorScheme.primary
+        isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+        else -> MaterialTheme.colorScheme.surface
     }
 
     val textColor = when {
         day.isToday -> Color.White
-        isSelected -> Color(0xFF10171A)
+        isSelected -> MaterialTheme.colorScheme.onSurface
         else -> MaterialTheme.colorScheme.onSurface
     }
 
@@ -426,7 +419,7 @@ private fun WeekDayCard(
             .clip(RoundedCornerShape(16.dp))
             .background(bgColor)
             .then(
-                if (isSelected && !day.isToday) Modifier.border(1.dp, Color(0xFF10171A), RoundedCornerShape(16.dp))
+                if (isSelected && !day.isToday) Modifier.border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
                 else Modifier
             )
             .clickable(onClick = onClick)
@@ -455,10 +448,9 @@ private fun CalendarDayCell(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Smoother visual state
     val bgColor = when {
-        day.isToday -> Color(0xFF10171A)
-        isSelected -> Color(0xFF10171A).copy(alpha = 0.2f)
+        day.isToday -> MaterialTheme.colorScheme.primary
+        isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
         else -> Color.Transparent
     }
 
@@ -467,7 +459,7 @@ private fun CalendarDayCell(
     Box(
         modifier = modifier
             .aspectRatio(1f)
-            .padding(4.dp) // Increased padding for separation
+            .padding(4.dp)
             .clip(CircleShape)
             .background(bgColor)
             .clickable(onClick = onClick),
@@ -485,7 +477,6 @@ private fun CalendarDayCell(
                     else -> MaterialTheme.colorScheme.onSurface.copy(alpha = textAlpha)
                 }
             )
-            // Show dot for today if not selected, or other indicator? Simplified to just text for now to clean UI
         }
     }
 }
@@ -496,7 +487,7 @@ private fun PrayerTimeRow(name: String, time: String) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .background(Color.White.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -506,7 +497,7 @@ private fun PrayerTimeRow(name: String, time: String) {
             time,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF10171A)
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -515,7 +506,7 @@ private fun PrayerTimeRow(name: String, time: String) {
 private fun RamadanCountdownCard(daysRemaining: Int) {
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color(0xFF10171A) // Golden background
+            containerColor = MaterialTheme.colorScheme.surface // Changed to surface color
         ),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
@@ -532,13 +523,13 @@ private fun RamadanCountdownCard(daysRemaining: Int) {
                     "العد التنازلي لرمضان",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     "باقي $daysRemaining يوم على الشهر الفضيل",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.9f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Text(
@@ -553,7 +544,7 @@ private fun RamadanCountdownCard(daysRemaining: Int) {
 private fun RamadanActiveCard(currentDay: Int) {
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color(0xFF10171A)
+            containerColor = MaterialTheme.colorScheme.primary
         ),
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -584,14 +575,14 @@ private fun CountdownBox(value: String, label: String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .background(Color.White, RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
             value,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF10171A)
+            color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             label,

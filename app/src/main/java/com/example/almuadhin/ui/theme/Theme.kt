@@ -47,7 +47,7 @@ private val LightColors = lightColorScheme(
     surface = WarmCream,
     onSurface = DeepBrown,
     surfaceVariant = Color(0xFFF5F0E6),
-    onSurfaceVariant = Color(0xFF5D4037),
+    onSurfaceVariant = Color(0xFF10171A),
     outline = Color(0xFF10171A).copy(alpha = 0.5f),
 
     surfaceContainerHighest = Color.White,
@@ -58,20 +58,20 @@ private val LightColors = lightColorScheme(
 )
 
 private val DarkColors = darkColorScheme(
-    primary = Color(0xFFFFD700),
-    onPrimary = Color(0xFF3D2E00),
-    primaryContainer = Color(0xFF574200),
-    onPrimaryContainer = Color(0xFFFFDF8E),
+    primary = Color(0xFFD4C4B0),
+    onPrimary = Color(0xFF221B17),
+    primaryContainer = Color(0xFF3D3229),
+    onPrimaryContainer = Color(0xFFEDE0D4),
 
     secondary = Color(0xFF80CBC4),
     onSecondary = Color(0xFF00332E),
     secondaryContainer = Color(0xFF004D40),
     onSecondaryContainer = Color(0xFFB2DFDB),
 
-    tertiary = Color(0xFFFFCC80),
+    tertiary = Color(0xFFD4C4B0),
     onTertiary = Color(0xFF4A2800),
     tertiaryContainer = Color(0xFF6A3C00),
-    onTertiaryContainer = Color(0xFFFFDDB3),
+    onTertiaryContainer = Color(0xFFEDE0D4),
 
     error = Color(0xFFFCA5A5),
     onError = Color(0xFF450A0A),

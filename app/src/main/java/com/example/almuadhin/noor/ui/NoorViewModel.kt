@@ -1,12 +1,13 @@
 package com.example.almuadhin.noor.ui
 
+import android.app.Application
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.almuadhin.noor.api.ChatApiClient
 import com.example.almuadhin.noor.api.ChatStreamingClient
@@ -18,15 +19,18 @@ import com.example.almuadhin.noor.data.ApiProvider
 import com.example.almuadhin.noor.data.Message
 import com.example.almuadhin.noor.data.Conversation
 import com.example.almuadhin.noor.data.MessageFile
+import com.example.almuadhin.noor.data.db.ConversationRepository
 import com.example.almuadhin.noor.utils.ImageProcessor
 import com.example.almuadhin.noor.utils.MessagePreparer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
-class NoorViewModel : ViewModel() {
+class NoorViewModel(application: Application) : AndroidViewModel(application) {
 
     private val TAG = "NoorViewModel"
+    private val conversationRepository = ConversationRepository(application.applicationContext)
 
     // UI State
     var conversations by mutableStateOf<List<Conversation>>(emptyList())
@@ -67,6 +71,21 @@ class NoorViewModel : ViewModel() {
     init {
         selectedModelId = ConfigManager.get(ConfigManager.Keys.PUBLIC_LLM_ROUTER_ALIAS_ID, "omni")
         fetchModels()
+        loadConversations()
+    }
+    
+    private fun loadConversations() {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val loadedConversations = conversationRepository.getAllConversationsSync()
+                withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    conversations = loadedConversations
+                    Log.d(TAG, "Loaded ${loadedConversations.size} conversations from database")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to load conversations: ${e.message}", e)
+            }
+        }
     }
 
     override fun onCleared() {
@@ -111,6 +130,16 @@ class NoorViewModel : ViewModel() {
         if (currentConversation?.id == conversation.id) {
             newChat()
         }
+        
+        // Delete from database
+        viewModelScope.launch {
+            try {
+                conversationRepository.deleteConversation(conversation.id)
+                Log.d(TAG, "Conversation deleted from DB: ${conversation.title}")
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to delete conversation: ${e.message}", e)
+            }
+        }
     }
 
     fun selectModel(modelId: String) {
@@ -125,7 +154,7 @@ class NoorViewModel : ViewModel() {
         val messageFiles = pendingFiles.toList()
 
         val userMessage = Message(
-            id = System.currentTimeMillis().toString(),
+            id = UUID.randomUUID().toString(),
             content = messageText,
             isUser = true,
             timestamp = System.currentTimeMillis(),
@@ -136,18 +165,29 @@ class NoorViewModel : ViewModel() {
 
         if (currentConversation == null) {
             val newId = UUID.randomUUID().toString()
+            val generatedTitle = conversationRepository.generateTitle(messageText)
             val newConversation = Conversation(
                 id = newId,
-                title = messageText.take(30) + if (messageText.length > 30) "..." else "",
+                title = generatedTitle,
                 messages = messages,
                 timestamp = System.currentTimeMillis(),
                 model = selectedModelId
             )
             currentConversation = newConversation
             conversations = listOf(newConversation) + conversations
+            
+            // Save to database in background (IO dispatcher)
+            viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                try {
+                    conversationRepository.saveConversation(newConversation)
+                    Log.d(TAG, "Conversation saved: $generatedTitle")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to save conversation: ${e.message}", e)
+                }
+            }
         }
 
-        val assistantMessageId = System.currentTimeMillis().toString()
+        val assistantMessageId = UUID.randomUUID().toString()
         var assistantMessage = Message(
             id = assistantMessageId,
             content = "",
@@ -205,6 +245,7 @@ class NoorViewModel : ViewModel() {
                         is StreamEvent.Complete -> {
                             isLoading = false
                             updateCurrentConversation()
+                            saveCurrentConversationToDB() // حفظ فقط عند الانتهاء
                         }
                         is StreamEvent.Error -> {
                             Log.e(TAG, "Stream error: ${event.error}")
@@ -218,6 +259,7 @@ class NoorViewModel : ViewModel() {
                             )
                             messages = messages.dropLast(1) + errorMessage
                             updateCurrentConversation()
+                            saveCurrentConversationToDB() // حفظ حتى عند الخطأ
                         }
                         is StreamEvent.RouterMetadata -> {}
                         is StreamEvent.Status -> {}
@@ -226,6 +268,7 @@ class NoorViewModel : ViewModel() {
                         is StreamEvent.ToolCallsComplete -> {
                             isLoading = false
                             updateCurrentConversation()
+                            saveCurrentConversationToDB() // حفظ عند انتهاء Tool Calls
                         }
                     }
                 }
@@ -241,6 +284,7 @@ class NoorViewModel : ViewModel() {
                 )
                 messages = messages.dropLast(1) + errorMessage
                 updateCurrentConversation()
+                saveCurrentConversationToDB() // حفظ عند exception
             }
         }
     }
@@ -251,16 +295,35 @@ class NoorViewModel : ViewModel() {
         streamingJob = null
         isLoading = false
         updateCurrentConversation()
+        saveCurrentConversationToDB() // حفظ عند الإيقاف اليدوي
     }
 
     fun regenerateLastMessage() {
-        val lastUserMessage = messages.lastOrNull { it.isUser }
-        if (lastUserMessage != null) {
+        try {
+            // Stop any ongoing generation first
+            if (isLoading) {
+                stopGeneration()
+                return
+            }
+            
+            val lastUserMessage = messages.lastOrNull { it.isUser }
+            if (lastUserMessage == null) {
+                Log.w(TAG, "No user message found to regenerate")
+                return
+            }
+            
+            // Remove last AI response if exists
             val lastMessage = messages.lastOrNull()
             if (lastMessage != null && !lastMessage.isUser) {
                 messages = messages.dropLast(1)
+                updateCurrentConversation()
             }
+            
+            // Send the last user message again
             sendMessage(lastUserMessage.content)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error regenerating message: ${e.message}", e)
+            error = "فشل إعادة التوليد: ${e.message}"
         }
     }
 
@@ -270,7 +333,7 @@ class NoorViewModel : ViewModel() {
             kotlinx.coroutines.delay(1000)
 
             val aiResponse = Message(
-                id = System.currentTimeMillis().toString(),
+                id = UUID.randomUUID().toString(),
                 content = buildString {
                     appendLine("👋 مرحباً! أنا **نور** - مساعدك الذكي.")
                     appendLine()
@@ -290,6 +353,7 @@ class NoorViewModel : ViewModel() {
             )
             messages = messages + aiResponse
             updateCurrentConversation()
+            saveCurrentConversationToDB() // حفظ بعد الرد المحاكي
             isLoading = false
         }
     }
@@ -298,6 +362,20 @@ class NoorViewModel : ViewModel() {
         currentConversation = currentConversation?.copy(messages = messages)
         currentConversation?.let { conv ->
             conversations = conversations.map { if (it.id == conv.id) conv else it }
+        }
+    }
+    
+    private fun saveCurrentConversationToDB() {
+        currentConversation?.let { conv ->
+            // Save to database in background (IO dispatcher)
+            viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                try {
+                    conversationRepository.updateConversation(conv)
+                    Log.d(TAG, "Conversation saved to DB: ${conv.title}")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to save conversation: ${e.message}", e)
+                }
+            }
         }
     }
 

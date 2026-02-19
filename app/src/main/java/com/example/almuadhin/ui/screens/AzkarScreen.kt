@@ -68,14 +68,7 @@ fun AzkarScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(contentPadding)
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFFDFBF5),
-                        Color(0xFFFFFCF4)
-                    )
-                )
-            )
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Column(
             modifier = Modifier
@@ -94,7 +87,7 @@ fun AzkarScreen(
                         "المسبحة الإلكترونية",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF10171A)
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
                         "اضغط على الدائرة للتسبيح",
@@ -105,14 +98,14 @@ fun AzkarScreen(
                 IconButton(
                     onClick = { vm.refresh(force = true) },
                     modifier = Modifier.background(
-                        Color(0xFF10171A).copy(alpha = 0.1f),
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                         RoundedCornerShape(50)
                     )
                 ) {
                     Icon(
                         Icons.Filled.Refresh,
                         contentDescription = "تحديث",
-                        tint = Color(0xFF10171A)
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -121,8 +114,8 @@ fun AzkarScreen(
             if (state.isLoading) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth(),
-                    color = Color(0xFF10171A),
-                    trackColor = Color(0xFF10171A).copy(alpha = 0.2f)
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                 )
             }
 
@@ -154,8 +147,8 @@ fun AzkarScreen(
             // Tabs
             TabRow(
                 selectedTabIndex = tab,
-                containerColor = Color.White.copy(alpha = 0.9f),
-                contentColor = Color(0xFF10171A)
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
             ) {
                 Tab(
                     selected = tab == 0,
@@ -173,8 +166,8 @@ fun AzkarScreen(
                             Text("أذكار الصباح")
                         }
                     },
-                    selectedContentColor = Color(0xFF10171A),
-                    unselectedContentColor = Color(0xFF8B7355)
+                    selectedContentColor = MaterialTheme.colorScheme.onSurface,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Tab(
                     selected = tab == 1,
@@ -192,8 +185,8 @@ fun AzkarScreen(
                             Text("أذكار المساء")
                         }
                     },
-                    selectedContentColor = Color(0xFF10171A),
-                    unselectedContentColor = Color(0xFF8B7355)
+                    selectedContentColor = MaterialTheme.colorScheme.onSurface,
+                    unselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -250,7 +243,7 @@ private fun TasbeehPager(list: List<ZikrItem>) {
             Text(
                 text = "الذكر ${pagerState.currentPage + 1} من ${list.size}",
                 style = MaterialTheme.typography.labelLarge,
-                color = Color(0xFF10171A),
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -307,7 +300,7 @@ private fun TasbeehCard(item: ZikrItem) {
         // Zikr Text Card - Full text with scroll
         ElevatedCard(
             colors = CardDefaults.elevatedCardColors(
-                containerColor = Color.White
+                containerColor = MaterialTheme.colorScheme.surface
             ),
             shape = RoundedCornerShape(24.dp),
             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
@@ -326,7 +319,7 @@ private fun TasbeehCard(item: ZikrItem) {
                     item.text,
                     style = MaterialTheme.typography.titleLarge.copy(lineHeight = 38.sp),
                     textAlign = TextAlign.Center,
-                    color = Color(0xFF4E342E),
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 20.sp
                 )
@@ -336,6 +329,9 @@ private fun TasbeehCard(item: ZikrItem) {
         Spacer(Modifier.height(16.dp))
 
         // Tasbeeh Counter Circle
+        val primaryColor = MaterialTheme.colorScheme.primary
+        val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+        val onSurfaceVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
         Box(
             modifier = Modifier
                 .size(220.dp)
@@ -344,7 +340,7 @@ private fun TasbeehCard(item: ZikrItem) {
                 .background(
                     Brush.radialGradient(
                         colors = if (done) listOf(Color(0xFF81C784), Color(0xFF4CAF50))
-                        else listOf(Color(0xFFF5E6CC), Color(0xFF10171A))
+                        else listOf(MaterialTheme.colorScheme.surfaceVariant, primaryColor)
                     )
                 )
                 .clickable(
@@ -371,7 +367,7 @@ private fun TasbeehCard(item: ZikrItem) {
 
                 // Progress Arc
                 drawArc(
-                    color = if (done) Color.White else Color(0xFF10171A),
+                    color = if (done) Color.White else primaryColor,
                     startAngle = -90f,
                     sweepAngle = 360f * progress.coerceIn(0f, 1f),
                     useCenter = false,
@@ -394,13 +390,13 @@ private fun TasbeehCard(item: ZikrItem) {
                         "$count",
                         fontSize = 56.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (done) Color.White else Color(0xFF5D4037)
+                        color = if (done) Color.White else onSurfaceColor
                     )
                 }
                 Text(
                     "من $targetCount",
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (done) Color.White.copy(alpha = 0.9f) else Color(0xFF8B7355)
+                    color = if (done) Color.White.copy(alpha = 0.9f) else onSurfaceVariantColor
                 )
             }
         }
@@ -418,7 +414,7 @@ private fun TasbeehCard(item: ZikrItem) {
                 onClick = { copyToClipboard(ctx, item.text) },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color(0xFF10171A)
+                    contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Icon(Icons.Filled.ContentCopy, contentDescription = "نسخ", modifier = Modifier.size(18.dp))
@@ -431,7 +427,7 @@ private fun TasbeehCard(item: ZikrItem) {
                 onClick = { currentCount = 0 },
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (done) Color(0xFF4CAF50) else Color(0xFF10171A)
+                    containerColor = if (done) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary
                 )
             ) {
                 Icon(Icons.Filled.Refresh, contentDescription = "إعادة", modifier = Modifier.size(18.dp))

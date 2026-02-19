@@ -118,14 +118,7 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(contentPadding)
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFFDFBF5),
-                        Color(0xFFFFFCF4)
-                    )
-                )
-            )
+            .background(MaterialTheme.colorScheme.background)
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -142,7 +135,7 @@ fun SettingsScreen(
                         "الإعدادات",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF10171A)
+                        color = MaterialTheme.colorScheme.primary
                     )
                     
                     // App Icon
@@ -171,7 +164,7 @@ fun SettingsScreen(
                             onClick = { vm.setLocationMode(LocationMode.AUTO); requestLocation() },
                             label = { Text("تلقائي (GPS)") },
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Color(0xFF10171A),
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
                                 selectedLabelColor = Color.White
                             ),
                             modifier = Modifier.weight(1f)
@@ -181,7 +174,7 @@ fun SettingsScreen(
                             onClick = { vm.setLocationMode(LocationMode.MANUAL) },
                             label = { Text("يدوي") },
                             colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Color(0xFF10171A),
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
                                 selectedLabelColor = Color.White
                             ),
                             modifier = Modifier.weight(1f)
@@ -197,8 +190,8 @@ fun SettingsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF10171A),
-                                focusedLabelColor = Color(0xFF10171A)
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                focusedLabelColor = MaterialTheme.colorScheme.primary
                             )
                         )
                         Spacer(Modifier.height(8.dp))
@@ -209,8 +202,8 @@ fun SettingsScreen(
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF10171A),
-                                focusedLabelColor = Color(0xFF10171A)
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                focusedLabelColor = MaterialTheme.colorScheme.primary
                             )
                         )
                     } else {
@@ -245,8 +238,8 @@ fun SettingsScreen(
                                 .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true)
                                 .fillMaxWidth(),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF10171A),
-                                focusedLabelColor = Color(0xFF10171A)
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                focusedLabelColor = MaterialTheme.colorScheme.primary
                             )
                         )
                         ExposedDropdownMenu(
@@ -287,7 +280,7 @@ fun SettingsScreen(
                                 .clip(RoundedCornerShape(12.dp))
                                 .clickable { vm.setAdhanSound(sound) }
                                 .background(
-                                    if (s.adhanSound == sound) Color(0xFF10171A).copy(alpha = 0.15f)
+                                    if (s.adhanSound == sound) MaterialTheme.colorScheme.outline
                                     else Color.Transparent
                                 )
                                 .padding(12.dp),
@@ -302,7 +295,7 @@ fun SettingsScreen(
                                     selected = s.adhanSound == sound,
                                     onClick = { vm.setAdhanSound(sound) },
                                     colors = RadioButtonDefaults.colors(
-                                        selectedColor = Color(0xFF10171A)
+                                        selectedColor = MaterialTheme.colorScheme.primary
                                     )
                                 )
                                 Column {
@@ -314,7 +307,7 @@ fun SettingsScreen(
                                         Text(
                                             "أذان كامل",
                                             style = MaterialTheme.typography.labelSmall,
-                                            color = Color(0xFF10171A)
+                                            color = MaterialTheme.colorScheme.primary
                                         )
                                     }
                                 }
@@ -327,7 +320,7 @@ fun SettingsScreen(
                                 Icon(
                                     imageVector = if (playingSound == sound) Icons.Default.StopCircle else Icons.Default.PlayCircle,
                                     contentDescription = if (playingSound == sound) "إيقاف" else "تشغيل",
-                                    tint = Color(0xFF10171A),
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(28.dp)
                                 )
                             }
@@ -336,7 +329,7 @@ fun SettingsScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = Color(0xFF10171A).copy(alpha = 0.2f)
+                        color = MaterialTheme.colorScheme.outlineVariant
                     )
 
                     Row(
@@ -357,7 +350,7 @@ fun SettingsScreen(
                             onCheckedChange = { vm.setPlayFullAdhan(it) },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
-                                checkedTrackColor = Color(0xFF10171A)
+                                checkedTrackColor = MaterialTheme.colorScheme.primary
                             )
                         )
                     }
@@ -384,7 +377,7 @@ fun SettingsScreen(
                             },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
-                                checkedTrackColor = Color(0xFF10171A)
+                                checkedTrackColor = MaterialTheme.colorScheme.primary
                             )
                         )
                     }
@@ -394,14 +387,14 @@ fun SettingsScreen(
                             Spacer(Modifier.height(12.dp))
                             ElevatedCard(
                                 colors = CardDefaults.elevatedCardColors(
-                                    containerColor = Color(0xFF10171A).copy(alpha = 0.1f)
+                                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                                 )
                             ) {
                                 Column(modifier = Modifier.padding(12.dp)) {
                                     Text(
                                         "⚠️ ملاحظة",
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF10171A)
+                                        color = MaterialTheme.colorScheme.primary
                                     )
                                     Text(
                                         "جهازك يحتاج تفعيل (Exact Alarms) لإرسال تنبيهات الأذان بدقة",
@@ -411,7 +404,7 @@ fun SettingsScreen(
                                     Button(
                                         onClick = { openExactAlarmSettings() },
                                         colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(0xFF10171A)
+                                            containerColor = MaterialTheme.colorScheme.primary
                                         )
                                     ) {
                                         Text("تفعيل الآن")
@@ -440,7 +433,7 @@ fun SettingsScreen(
                             onCheckedChange = { vm.setAdsRemoved(it) },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
-                                checkedTrackColor = Color(0xFF10171A)
+                                checkedTrackColor = MaterialTheme.colorScheme.primary
                             )
                         )
                     }
@@ -457,8 +450,8 @@ fun SettingsScreen(
                             valueRange = 0f..60f,
                             steps = 5,
                             colors = SliderDefaults.colors(
-                                thumbColor = Color(0xFF10171A),
-                                activeTrackColor = Color(0xFF10171A)
+                                thumbColor = MaterialTheme.colorScheme.primary,
+                                activeTrackColor = MaterialTheme.colorScheme.primary
                             )
                         )
                         Text(
@@ -485,7 +478,7 @@ fun SettingsScreen(
                         "المؤذن - تطبيق مواقيت الصلاة",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF10171A)
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
@@ -501,14 +494,14 @@ fun SettingsScreen(
                     )
 
                     Spacer(Modifier.height(16.dp))
-                    HorizontalDivider(color = Color(0xFF10171A).copy(alpha = 0.2f))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                     Spacer(Modifier.height(12.dp))
 
                     Text(
                          "المطور: محمد الرميحي",
                          style = MaterialTheme.typography.titleSmall,
                          fontWeight = FontWeight.Bold,
-                         color = Color(0xFF10171A)
+                         color = MaterialTheme.colorScheme.primary
                     )
 
                     Spacer(Modifier.height(8.dp))
@@ -567,7 +560,7 @@ private fun SettingsCard(
 ) {
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color.White.copy(alpha = 0.9f)
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -582,13 +575,13 @@ private fun SettingsCard(
                 Icon(
                     icon,
                     contentDescription = null,
-                    tint = Color(0xFF10171A)
+                    tint = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF10171A)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             content()
@@ -630,7 +623,7 @@ private fun NoorSettingsCard() {
 
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
-            containerColor = Color.White.copy(alpha = 0.9f)
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -643,13 +636,13 @@ private fun NoorSettingsCard() {
                 Icon(
                     Icons.Default.SmartToy,
                     contentDescription = null,
-                    tint = Color(0xFF10171A)
+                    tint = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     "إعدادات نور (AI)",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF10171A)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -675,8 +668,8 @@ private fun NoorSettingsCard() {
                         .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true)
                         .fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF10171A),
-                        focusedLabelColor = Color(0xFF10171A)
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary
                     )
                 )
                 ExposedDropdownMenu(
@@ -697,7 +690,7 @@ private fun NoorSettingsCard() {
             }
 
             Spacer(Modifier.height(16.dp))
-            HorizontalDivider(color = Color(0xFF10171A).copy(alpha = 0.2f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             Spacer(Modifier.height(16.dp))
 
             // HuggingFace Token
@@ -706,7 +699,7 @@ private fun NoorSettingsCard() {
                     "HuggingFace Token",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF10171A)
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
@@ -738,8 +731,8 @@ private fun NoorSettingsCard() {
                         }
                     },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF10171A),
-                        focusedLabelColor = Color(0xFF10171A)
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary
                     )
                 )
             }
@@ -750,7 +743,7 @@ private fun NoorSettingsCard() {
                     "Google AI Studio API Key",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF10171A)
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
@@ -782,8 +775,8 @@ private fun NoorSettingsCard() {
                         }
                     },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF10171A),
-                        focusedLabelColor = Color(0xFF10171A)
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary
                     )
                 )
             }

@@ -1,6 +1,10 @@
 package com.example.almuadhin.noor.ui
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
+import android.speech.RecognizerIntent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -15,6 +19,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,10 +46,12 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Warning
@@ -75,13 +82,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.almuadhin.noor.config.ConfigManager
 import com.example.almuadhin.noor.data.Message
 import com.example.almuadhin.noor.data.MessageFile
@@ -106,6 +116,31 @@ fun NoorScreen(
     // Drawer state
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    
+    // Speech Recognition launcher
+    val speechRecognizerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val spokenText = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.get(0) ?: ""
+            inputText = if (inputText.isNotEmpty()) "$inputText $spokenText" else spokenText
+        }
+    }
+    
+    // Audio permission launcher
+    val audioPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Start speech recognition
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ar-SA") // Arabic + English support
+                putExtra(RecognizerIntent.EXTRA_PROMPT, "تحدث الآن...")
+            }
+            speechRecognizerLauncher.launch(intent)
+        }
+    }
     
     // MCP Sheet state
     var showMCPSheet by remember { mutableStateOf(false) }
@@ -319,6 +354,7 @@ fun NoorScreen(
                     },
                     onAttachImage = { imagePickerLauncher.launch("image/*") },
                     onAttachFile = { filePickerLauncher.launch(arrayOf("*/*")) },
+                    onVoiceInput = { audioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO) },
                     isLoading = viewModel.isLoading,
                     onStop = { viewModel.stopGeneration() },
                     onRegenerate = { viewModel.regenerateLastMessage() },
@@ -444,6 +480,7 @@ private fun WelcomeMessage(modifier: Modifier = Modifier) {
 @Composable
 private fun ChatMessageBubble(message: Message, isLoading: Boolean = false) {
     val isUser = message.isUser
+    val clipboardManager = LocalClipboardManager.current
     
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -466,6 +503,25 @@ private fun ChatMessageBubble(message: Message, isLoading: Boolean = false) {
             )
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
+                // Copy button
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    IconButton(
+                        onClick = {
+                            clipboardManager.setText(AnnotatedString(message.content))
+                        },
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.ContentCopy,
+                            contentDescription = "نسخ",
+                            tint = Color.White.copy(alpha = 0.6f),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
                 // Show files if any
                 if (message.files.isNotEmpty()) {
                     message.files.forEach { file ->
@@ -492,12 +548,14 @@ private fun ChatMessageBubble(message: Message, isLoading: Boolean = false) {
                 if (isLoading && message.content.isEmpty()) {
                     LoadingDots()
                 } else {
-                    Text(
-                        text = message.content,
-                        color = if (message.content.startsWith("⚠️")) Color(0xFFFF8A80) else Color.White,
-                        style = MaterialTheme.typography.bodyLarge,
-                        lineHeight = 24.sp
-                    )
+                    SelectionContainer {
+                        Text(
+                            text = message.content,
+                            color = if (message.content.startsWith("⚠️")) Color(0xFFFF8A80) else Color.White,
+                            style = MaterialTheme.typography.bodyLarge,
+                            lineHeight = 24.sp
+                        )
+                    }
                 }
             }
         }
@@ -539,6 +597,7 @@ private fun ChatInputField(
     onSend: () -> Unit,
     onAttachImage: () -> Unit,
     onAttachFile: () -> Unit,
+    onVoiceInput: () -> Unit,
     isLoading: Boolean,
     onStop: () -> Unit,
     onRegenerate: () -> Unit,
@@ -558,6 +617,11 @@ private fun ChatInputField(
         
         IconButton(onClick = onAttachFile) {
             Icon(Icons.Default.AttachFile, contentDescription = "ملف", tint = Color.White.copy(alpha = 0.7f))
+        }
+        
+        // Voice input button
+        IconButton(onClick = onVoiceInput) {
+            Icon(Icons.Default.Mic, contentDescription = "تسجيل صوتي", tint = Color(0xFF4CAF50))
         }
         
         OutlinedTextField(

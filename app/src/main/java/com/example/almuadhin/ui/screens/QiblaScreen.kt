@@ -157,14 +157,7 @@ fun QiblaScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(contentPadding)
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFFDFBF5),
-                        Color(0xFFFFFCF4)
-                    )
-                )
-            ),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -177,7 +170,7 @@ fun QiblaScreen(
                 "اتجاه القبلة",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF10171A)
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             // Compass
@@ -185,7 +178,7 @@ fun QiblaScreen(
                 modifier = Modifier
                     .size(300.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.9f)),
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
                 contentAlignment = Alignment.Center
             ) {
                 // Compass rose
@@ -288,7 +281,7 @@ fun QiblaScreen(
             if (userLocation != null) {
                 ElevatedCard(
                     colors = CardDefaults.elevatedCardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
+                        containerColor = MaterialTheme.colorScheme.surface
                     ),
                     shape = RoundedCornerShape(24.dp),
                     elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
@@ -302,7 +295,7 @@ fun QiblaScreen(
                             "${qiblaDirection.toInt()}°",
                             fontSize = 48.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF10171A)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -346,7 +339,7 @@ fun QiblaScreen(
             // Calibration hint
             ElevatedCard(
                 colors = CardDefaults.elevatedCardColors(
-                    containerColor = Color(0xFFFDFBF5)
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
