@@ -1,31 +1,25 @@
-name: بناء تطبيق محمد عبدالعظيم (APK)
+name: Build APK
 
 on:
-  workflow_dispatch:    # عشان تشغله يدوي بالزر
-  push:                 # وعلشان يشتغل لو عملت push جديد
-    branches: [ main ]
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 تحميل الكود (Checkout)
-        uses: actions/checkout@v4
-
-      - name: ☕ إعداد Java (JDK 17)
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-
-      - name: 🔑 منح صلاحية التنفيذ لـ gradlew
-        run: chmod +x gradlew
-
-      - name: 🛠️ بناء نسخة Debug APK
-        run: ./gradlew :app:assembleDebug
-
-      - name: 📤 رفع ملف APK الناتج
-        uses: actions/upload-artifact@v4
+      - uses: subosito/flutter-action@v2
         with:
-          name: ALmuadhin-App-Debug
-          path: app/build/outputs/apk/debug/*.apk
+          flutter-version: '3.x'
+      - run: flutter pub get
+      - run: flutter build apk --debug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mohamed-abdelazim-app
+          path: build/app/outputs/flutter-apk/*.apk
