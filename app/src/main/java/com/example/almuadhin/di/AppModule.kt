@@ -40,18 +40,7 @@ object AppModule {
         return database.noorDao()
     }
 */
-    @Provides
-    @Singleton
-    fun provideFirebaseAuth(): com.google.firebase.auth.FirebaseAuth {
-        return com.google.firebase.auth.FirebaseAuth.getInstance()
-    }
+}
 
-    @Provides
-    @Singleton
-    fun provideFirebaseDatabase(): com.google.firebase.database.FirebaseDatabase {
-        val instance = com.google.firebase.database.FirebaseDatabase.getInstance()
-        instance.setPersistenceEnabled(true) // Enable offline persistence
-        return instance
-    }
-}*/
+    
 
