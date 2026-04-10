@@ -53,5 +53,5 @@ object AppModule {
         instance.setPersistenceEnabled(true) // Enable offline persistence
         return instance
     }
-}
+}*/
 
