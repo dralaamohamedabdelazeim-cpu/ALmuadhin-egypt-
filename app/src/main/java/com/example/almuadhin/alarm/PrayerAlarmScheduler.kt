@@ -72,11 +72,12 @@ class PrayerAlarmScheduler @Inject constructor(
             else -> prayerName
         }
 
-        val pi = pendingIntent(
-            id = id,
-            title = "حان وقت صلاة $arabicName",
-            body = "الوقت: $time",
-            adhanSoundName = adhanSoundName
+val pi = pendingIntent(
+    id = id,
+    title = "حان وقت صلاة $arabicName",
+    body = "الوقت: $time",
+    adhanSoundName = adhanSoundName,
+    isSilent = prayerName == "Fajr"
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -86,12 +87,13 @@ class PrayerAlarmScheduler @Inject constructor(
         }
     }
 
-    private fun pendingIntent(id: Int, title: String, body: String, adhanSoundName: String): PendingIntent {
+private fun pendingIntent(id: Int, title: String, body: String, adhanSoundName: String, isSilent: Boolean = false,
         val intent = Intent(context, AlarmReceiver::class.java).apply {
             putExtra(AlarmReceiver.EXTRA_ID, id)
             putExtra(AlarmReceiver.EXTRA_TITLE, title)
-            putExtra(AlarmReceiver.EXTRA_BODY, body)
             putExtra(AlarmReceiver.EXTRA_ADHAN_SOUND, adhanSoundName)
+            putExtra(AlarmReceiver.EXTRA_IS_SILENT, isSilent)
+
         }
         return PendingIntent.getBroadcast(
             context,
