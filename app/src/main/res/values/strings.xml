@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">محمد عبدالعظيم</string>
-    <string name="notif_prayer_title">تنبيه الصلاة</string>
-    <string name="notif_prayer_body">حان وقت الصلاة</string>
+    <string name="app_name"> مؤذن محمد عبد العظيم</string>
+    <string name="notif_prayer_title"> تنبيه محمد عبد العظيم للصلاة</string>
+    <string name="notif_prayer_body">حان وقت الصلاة، رحمة الله على الوالد محمد عبد العظيم 🤲    </string>
     
     <!-- Navigation -->
     <string name="nav_home">الصلاة</string>
