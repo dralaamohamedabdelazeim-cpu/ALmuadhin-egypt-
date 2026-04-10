@@ -2,56 +2,35 @@ name: Build & Release APK
 
 on:
   push:
-    tags:
-      - 'v*'          # يشتغل لما تعمل tag زي v1.0.0
-  workflow_dispatch:  # أو تشغله يدوياً من GitHub
+    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. نزّل الكود
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # 2. إعداد Java 17
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. كاش Gradle عشان يكون أسرع
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: gradle-
+      - run: chmod +x gradlew
 
-      # 4. صلاحيات gradlew
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      # 5. إنشاء Keystore وهمي تلقائياً
-      - name: Generate self-signed Keystore
+      - name: Generate Keystore
         run: |
           keytool -genkeypair \
             -alias almuadhin \
-            -keyalg RSA \
-            -keysize 2048 \
+            -keyalg RSA -keysize 2048 \
             -validity 9125 \
             -keystore almuadhin.jks \
             -storepass almuadhin123 \
             -keypass almuadhin123 \
-            -dname "CN=ALmuadhin, OU=Egypt, O=Islamic, L=Cairo, S=Cairo, C=EG" \
+            -dname "CN=ALmuadhin,O=Islamic,C=EG" \
             -noprompt
 
-      # 6. بناء الـ APK
-      - name: Build Release APK
+      - name: Build APK
         run: |
           ./gradlew assembleRelease \
             -Pandroid.injected.signing.store.file=${{ github.workspace }}/almuadhin.jks \
@@ -59,41 +38,12 @@ jobs:
             -Pandroid.injected.signing.key.alias=almuadhin \
             -Pandroid.injected.signing.key.password=almuadhin123
 
-      # 7. ابحث عن الـ APK واحتفظ بمساره
-      - name: Find APK
-        id: find_apk
-        run: |
-          APK_PATH=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
-          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
-          echo "✅ APK found: $APK_PATH"
-
-      # 8. ارفع الـ APK كـ artifact (متاح دايماً حتى بدون tag)
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ALmuadhin-release-apk
-          path: ${{ steps.find_apk.outputs.apk_path }}
-          retention-days: 30
-
-      # 9. أنشئ GitHub Release تلقائياً (فقط لما تعمل tag)
-      - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Create Release with APK
         uses: softprops/action-gh-release@v2
         with:
-          name: "المؤذن ${{ github.ref_name }}"
-          body: |
-            ## 📱 تطبيق المؤذن - ${{ github.ref_name }}
-            
-            تطبيق إسلامي شامل لمواقيت الصلاة والأذكار واتجاه القبلة والتقويم الهجري.
-            
-            ### 🆕 كيفية التثبيت
-            1. حمّل ملف `ALmuadhin.apk` من الأسفل
-            2. فعّل "السماح بمصادر غير معروفة" في إعدادات هاتفك
-            3. افتح الملف وثبّت التطبيق
-            
-            ### ⚠️ ملاحظة
-            هذا الـ APK موقّع بتوقيع تلقائي (self-signed) للتوزيع المباشر.
-          files: ${{ steps.find_apk.outputs.apk_path }}
+          tag_name: "build-${{ github.run_number }}"
+          name: "مؤذن محمد عبد العظيم - إصدار ${{ github.run_number }}"
+          files: app/build/outputs/apk/release/*.apk
           draft: false
           prerelease: false
         env:
