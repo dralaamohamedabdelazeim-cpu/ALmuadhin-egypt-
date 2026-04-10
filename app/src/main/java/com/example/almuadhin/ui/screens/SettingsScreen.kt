@@ -475,7 +475,7 @@ fun SettingsScreen(
                     icon = Icons.Default.Info
                 ) {
                     Text(
-                        "المؤذن - تطبيق مواقيت الصلاة",
+                        "المؤذن - تطبيق محمد عبد العظيم الطويل مواقيت الصلاة",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -498,7 +498,7 @@ fun SettingsScreen(
                     Spacer(Modifier.height(12.dp))
 
                     Text(
-                         "المطور: محمد الرميحي",
+                         "المطور: علاء محمد عبد العظيم ",
                          style = MaterialTheme.typography.titleSmall,
                          fontWeight = FontWeight.Bold,
                          color = MaterialTheme.colorScheme.primary
