@@ -15,7 +15,10 @@ enum class AdhanSound(val resId: Int, val labelAr: String, val isFull: Boolean =
     MAKKAH(R.raw.adhan_makkah, "أذان مكة المكرمة"),
     MADINAH(R.raw.adhan_madinah, "أذان المدينة المنورة"),
     ALAQSA(R.raw.adhan_alaqsa, "أذان المسجد الأقصى"),
-    MAKKAH_FULL(R.raw.adhan_makkah_full, "أذان مكة الكامل", isFull = true)
+    MAKKAH_FULL(R.raw.adhan_makkah_full, "أذان مكة الكامل", isFull = true),
+    ELHOSARY(R.raw.adhan_elhosary, "الشيخ الحصري"),
+    ELNAKSHBANDY(R.raw.adhan_elnakshbandy, "الشيخ النقشبندي"),
+    MOHAMED_REFAT(R.raw.adhan_mohamed_refat, "الشيخ محمد رفعت")
 }
 
 data class UserSettings(
