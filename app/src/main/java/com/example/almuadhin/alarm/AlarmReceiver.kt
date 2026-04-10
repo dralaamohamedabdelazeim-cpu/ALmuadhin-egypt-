@@ -17,7 +17,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val body = intent.getStringExtra(EXTRA_BODY) ?: context.getString(R.string.notif_prayer_body)
         val adhanSoundName = intent.getStringExtra(EXTRA_ADHAN_SOUND) ?: AdhanSound.MAKKAH.name
         val notifId = intent.getIntExtra(EXTRA_ID, 1001)
-
+val isSilent = intent.getBooleanExtra(EXTRA_IS_SILENT, false)
         val adhanSound = try {
             AdhanSound.valueOf(adhanSoundName)
         } catch (e: Exception) {
@@ -57,7 +57,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .setAutoCancel(false)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setSound(soundUri)
+            .setSound(if (isSilent) null else soundUri)
             .setFullScreenIntent(fullScreenPi, true)
             .addAction(0, "إغلاق الأذان", dismissPi)
             .build()
@@ -70,5 +70,6 @@ class AlarmReceiver : BroadcastReceiver() {
         const val EXTRA_TITLE = "extra_title"
         const val EXTRA_BODY = "extra_body"
         const val EXTRA_ADHAN_SOUND = "extra_adhan_sound"
+        const val EXTRA_IS_SILENT = "extra_is_silent"
     }
 }
