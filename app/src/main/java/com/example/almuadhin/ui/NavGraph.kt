@@ -42,7 +42,7 @@ sealed class BottomDest(val route: String, val label: String, val icon: androidx
     data object Calendar : BottomDest("calendar", "التقويم", Icons.Filled.CalendarMonth)
     data object Qibla : BottomDest("qibla", "القبلة", Icons.Filled.Explore)
     data object Azkar : BottomDest("azkar", "الأذكار", Icons.AutoMirrored.Filled.MenuBook)
-    data object Noor : BottomDest("noor", "نور", Icons.Filled.Chat) // New Tab
+   // data object Noor : BottomDest("noor", "نور", Icons.Filled.Chat) // New Tab
     data object Settings : BottomDest("settings", "الضبط", Icons.Filled.Settings)
 }
 
@@ -54,7 +54,7 @@ fun NavGraph() {
         BottomDest.Calendar,
         BottomDest.Qibla,
         BottomDest.Azkar,
-        BottomDest.Noor, // Add to bottom bar
+       // BottomDest.Noor, // Add to bottom bar
         BottomDest.Settings
     )
 
@@ -111,23 +111,23 @@ fun NavGraph() {
             composable(BottomDest.Azkar.route) {
                 AzkarScreen(contentPadding = padding)
             }
-            composable(BottomDest.Noor.route) {
-                NoorScreen(
-                    contentPadding = padding,
-                    onSettingsClick = { navController.navigate(BottomDest.Settings.route) },
-                    onModelsClick = { navController.navigate("noor_models") }
-                )
-            }
-            composable("noor_models") {
-                ModelsScreen(
-                    onBackClick = { navController.popBackStack() },
-                    onModelSelect = { modelId ->
+           // composable(BottomDest.Noor.route) {
+             //   NoorScreen(
+               //     contentPadding = padding,
+                //    onSettingsClick = { navController.navigate(BottomDest.Settings.route) },
+                //    onModelsClick = { navController.navigate("noor_models") }
+             //   )
+         //   }
+        //    composable("noor_models") {
+         //       ModelsScreen(
+          //          onBackClick = { navController.popBackStack() },
+           //         onModelSelect = { modelId ->
                         // TODO: Update selected model in NoorViewModel
-                        navController.popBackStack()
-                    },
-                    selectedModelId = "Omni" // TODO: Get from NoorViewModel
-                )
-            }
+             //           navController.popBackStack()
+            //        },
+              //      selectedModelId = "Omni" // TODO: Get from NoorViewModel
+         //       )
+         //   }
             composable(BottomDest.Settings.route) {
                 SettingsScreen(contentPadding = padding)
             }
