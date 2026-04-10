@@ -464,9 +464,9 @@ fun SettingsScreen(
             }
 
             // Noor AI Settings
-            item {
-                NoorSettingsCard()
-            }
+         //   item {
+        //        NoorSettingsCard()
+        //    }
 
             // App Info
             item {
@@ -530,12 +530,12 @@ fun SettingsScreen(
                              Spacer(Modifier.width(12.dp))
                              Column {
                                  Text(
-                                     "للإبلاغ عن عطل",
-                                     style = MaterialTheme.typography.titleSmall,
-                                     fontWeight = FontWeight.Bold
+                                 //    "للإبلاغ عن عطل",
+                                  //   style = MaterialTheme.typography.titleSmall,
+                                 //    fontWeight = FontWeight.Bold
                                  )
-                                 Text(
-                                     "msr7799 (GitHub)", // GitHub Link
+                              //   Text(
+                                //     "msr7799 (GitHub)", // GitHub Link
                                      style = MaterialTheme.typography.bodySmall,
                                      color = MaterialTheme.colorScheme.onSurfaceVariant
                                  )
