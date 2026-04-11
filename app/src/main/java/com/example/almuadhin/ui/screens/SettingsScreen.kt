@@ -1,4 +1,4 @@
-9package com.example.almuadhin.ui.screens
+package com.example.almuadhin.ui.screens
 
 import android.Manifest
 import android.content.Intent
