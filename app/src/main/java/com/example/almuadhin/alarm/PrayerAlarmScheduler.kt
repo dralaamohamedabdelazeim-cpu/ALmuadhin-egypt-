@@ -27,12 +27,12 @@ class PrayerAlarmScheduler @Inject constructor(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) alarmManager.canScheduleExactAlarms() else true
     }
 
-    fun scheduleForToday(day: PrayerDay, adhanSoundName: String, zoneId: ZoneId = ZoneId.systemDefault()) {
+    fun scheduleForToday(day: PrayerDay, adhanSoundName: String, zoneId: ZoneId = ZoneId.systemDefault(), silentFajr: Boolean = false) {
         val today = LocalDate.now(zoneId)
-        scheduleForDate(today, day, adhanSoundName, zoneId)
+        scheduleForDate(today, day, adhanSoundName, zoneId, silentFajr)
     }
 
-    fun scheduleForDate(date: LocalDate, day: PrayerDay, adhanSoundName: String, zoneId: ZoneId = ZoneId.systemDefault()) {
+    fun scheduleForDate(date: LocalDate, day: PrayerDay, adhanSoundName: String, zoneId: ZoneId = ZoneId.systemDefault(), silentFajr: Boolean = false) {
         val list = listOf(
             AlarmSpec(2001, "Fajr", day.fajr),
             AlarmSpec(2002, "Dhuhr", day.dhuhr),
@@ -42,7 +42,7 @@ class PrayerAlarmScheduler @Inject constructor(
         )
 
         for (spec in list) {
-            scheduleExact(spec.id, spec.name, date, spec.time, adhanSoundName, zoneId)
+            scheduleExact(spec.id, spec.name, date, spec.time, adhanSoundName, zoneId, silentFajr)
         }
     }
 
@@ -53,7 +53,7 @@ class PrayerAlarmScheduler @Inject constructor(
         }
     }
 
-    private fun scheduleExact(id: Int, prayerName: String, date: LocalDate, time: String, adhanSoundName: String, zoneId: ZoneId) {
+    private fun scheduleExact(id: Int, prayerName: String, date: LocalDate, time: String, adhanSoundName: String, zoneId: ZoneId, silentFajr: Boolean = false) {
         val triggerAt = TimeUtils.toMillis(date, time, zoneId)
         val now = System.currentTimeMillis()
         val actualTrigger = if (triggerAt <= now) {
@@ -69,7 +69,7 @@ class PrayerAlarmScheduler @Inject constructor(
             else -> prayerName
         }
 
-        val isSilent = prayerName == "Fajr"
+        val isSilent = prayerName == "Fajr" && silentFajr
 
         val pi = pendingIntent(
             id = id,
@@ -108,6 +108,7 @@ class PrayerAlarmScheduler @Inject constructor(
 
         val stored = settingsRepository.storedPrayerDayFlow.first() ?: return
         val day = stored.second
-        scheduleForToday(day, settings.adhanSound.name)
+        scheduleForToday(day, settings.adhanSound.name, silentFajr = settings.silentFajr)
     }
 }
+
