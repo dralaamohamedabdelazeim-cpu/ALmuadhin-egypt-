@@ -49,6 +49,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+ android:name=".ui.screens.AzanFullScreenActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:theme="@style/Theme.Muadhin" />
 
         <receiver
             android:name=".alarm.BootReceiver"
