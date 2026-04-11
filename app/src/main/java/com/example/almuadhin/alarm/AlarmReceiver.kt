@@ -5,11 +5,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.media.MediaPlayer
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.almuadhin.R
 import com.example.almuadhin.data.AdhanSound
-import android.media.MediaPlayer
+import com.example.almuadhin.ui.screens.AzanFullScreenActivity
+
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -17,21 +19,26 @@ class AlarmReceiver : BroadcastReceiver() {
         val body = intent.getStringExtra(EXTRA_BODY) ?: context.getString(R.string.notif_prayer_body)
         val adhanSoundName = intent.getStringExtra(EXTRA_ADHAN_SOUND) ?: AdhanSound.MAKKAH.name
         val notifId = intent.getIntExtra(EXTRA_ID, 1001)
-val isSilent = intent.getBooleanExtra(EXTRA_IS_SILENT, false)
+        val isSilent = intent.getBooleanExtra(EXTRA_IS_SILENT, false)
         val adhanSound = try {
             AdhanSound.valueOf(adhanSoundName)
         } catch (e: Exception) {
             AdhanSound.MAKKAH
         }
-if (!isSilent) {
-    val mp = MediaPlayer.create(context, adhanSound.resId)
-    mp?.isLooping = true
-    mp?.start()
-    AzanMediaPlayer.player = mp
-}
+
+        if (!isSilent) {
+            val mp = MediaPlayer.create(context, adhanSound.resId)
+            mp?.isLooping = true
+            mp?.start()
+            AzanMediaPlayer.player = mp
+        }
+
         NotificationHelper.ensureChannels(context, adhanSound)
 
-        val openIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        val openIntent = Intent(context, AzanFullScreenActivity::class.java).apply {
+            putExtra("prayer_name", title)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
         val pi = PendingIntent.getActivity(
             context, 0, openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -45,6 +52,10 @@ if (!isSilent) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val fullScreenPi = PendingIntent.getActivity(
+            context, notifId + 100, openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         val soundUri = NotificationHelper.getAdhanSoundUri(context, adhanSound)
         val largeBitmap = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
@@ -59,10 +70,11 @@ if (!isSilent) {
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSound(if (isSilent) null else soundUri)
-            
+            .setFullScreenIntent(fullScreenPi, true)
             .addAction(0, "إغلاق الأذان", dismissPi)
             .build()
-        
+
+        NotificationManagerCompat.from(context).notify(notifId, notif)
     }
 
     companion object {
