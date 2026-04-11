@@ -58,7 +58,7 @@ class SettingsRepository @Inject constructor(
             adhanSound = prefs[Keys.ADHAN_SOUND]
                 ?.let { runCatching { AdhanSound.valueOf(it) }.getOrNull() }
                 ?: AdhanSound.MAKKAH,
-            playFullAdhan = prefs[Keys.PLAY_FULL_ADHAN] ?: false
+            playFullAdhan = prefs[Keys.PLAY_FULL_ADHAN] ?: false,
             silentFajr = prefs[Keys.SILENT_FAJR] ?: false,
         )
     }
