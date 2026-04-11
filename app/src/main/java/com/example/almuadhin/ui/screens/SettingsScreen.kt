@@ -562,13 +562,13 @@ fun SettingsScreen(
                              )
                              Spacer(Modifier.width(12.dp))
                              Column {
-                                 Text(
+                                // Text(
                                  //    "للإبلاغ عن عطل",
                                   //   style = MaterialTheme.typography.titleSmall,
                                  //    fontWeight = FontWeight.Bold
                                 //     )
                                 //   Text(
-                               //       "msr7799 (GitHub)", // GitHub Link
+                                     "msr7799 (GitHub)", // GitHub Link
                                  //    style = MaterialTheme.typography.bodySmall,
                                //      color = MaterialTheme.colorScheme.onSurfaceVariant
                                  )
