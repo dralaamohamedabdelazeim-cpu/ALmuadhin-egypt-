@@ -36,6 +36,6 @@ class SettingsViewModel @Inject constructor(
     fun setAdCooldown(minutes: Int) = viewModelScope.launch { repo.setAdCooldownMinutes(minutes) }
     fun setAdhanSound(sound: AdhanSound) = viewModelScope.launch { repo.setAdhanSound(sound) }
     fun setSilentFajr(silent: Boolean) = viewModelScope.launch { repo.setSilentFajr(silent) }
-
+    fun setPlayFullAdhan(playFull: Boolean) = viewModelScope.launch { repo.setPlayFullAdhan(playFull) }
     suspend fun current(): UserSettings = repo.settingsFlow.first()
 }
