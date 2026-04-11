@@ -568,7 +568,7 @@ fun SettingsScreen(
                                  //    fontWeight = FontWeight.Bold
                                 //     )
                                 //   Text(
-                                      "msr7799 (GitHub)", // GitHub Link
+                               //       "msr7799 (GitHub)", // GitHub Link
                                  //    style = MaterialTheme.typography.bodySmall,
                                //      color = MaterialTheme.colorScheme.onSurfaceVariant
                                  )
