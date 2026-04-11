@@ -37,6 +37,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         val openIntent = Intent(context, AzanFullScreenActivity::class.java).apply {
             putExtra("prayer_name", title)
+            putExtra("notif_id", notifId)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         val pi = PendingIntent.getActivity(
