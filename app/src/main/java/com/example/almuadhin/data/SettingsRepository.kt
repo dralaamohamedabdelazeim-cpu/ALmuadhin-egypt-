@@ -29,7 +29,7 @@ class SettingsRepository @Inject constructor(
         val AD_COOLDOWN_MIN = intPreferencesKey("ad_cooldown_min")
         val ADHAN_SOUND = stringPreferencesKey("adhan_sound")
         val PLAY_FULL_ADHAN = booleanPreferencesKey("play_full_adhan")
-
+         val SILENT_FAJR = booleanPreferencesKey("silent_fajr")
         // Stored prayer times for rescheduling after reboot
         val LAST_DATE = stringPreferencesKey("last_prayer_date")
         val IMSAK = stringPreferencesKey("last_imsak")
@@ -59,6 +59,7 @@ class SettingsRepository @Inject constructor(
                 ?.let { runCatching { AdhanSound.valueOf(it) }.getOrNull() }
                 ?: AdhanSound.MAKKAH,
             playFullAdhan = prefs[Keys.PLAY_FULL_ADHAN] ?: false
+            silentFajr = prefs[Keys.SILENT_FAJR] ?: false,
         )
     }
 
@@ -76,6 +77,7 @@ class SettingsRepository @Inject constructor(
             prefs[Keys.AD_COOLDOWN_MIN] = next.adCooldownMinutes
             prefs[Keys.ADHAN_SOUND] = next.adhanSound.name
             prefs[Keys.PLAY_FULL_ADHAN] = next.playFullAdhan
+            prefs[Keys.SILENT_FAJR] = next.silentFajr
         }
     }
 
@@ -105,6 +107,9 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setPlayFullAdhan(playFull: Boolean) =
         context.dataStore.edit { it[Keys.PLAY_FULL_ADHAN] = playFull }
+
+    suspend fun setSilentFajr(silent: Boolean) =
+    context.dataStore.edit { it[Keys.SILENT_FAJR] = silent }
 
     suspend fun savePrayerDayForReschedule(dateIso: String, day: PrayerDay) {
         context.dataStore.edit { prefs ->
