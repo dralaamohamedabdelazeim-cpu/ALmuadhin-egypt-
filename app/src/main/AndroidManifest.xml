@@ -24,6 +24,7 @@
     <!-- Optional -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <!-- Speech Recognition for Noor Screen -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
