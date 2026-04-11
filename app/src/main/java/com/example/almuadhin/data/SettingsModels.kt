@@ -35,7 +35,7 @@ data class UserSettings(
     val silentFajr: Boolean = false,
     val playFullAdhan: Boolean = false
 )
-
+fun setSilentFajr(silent: Boolean) = viewModelScope.launch { repo.setSilentFajr(silent) }
 data class PrayerDay(
     val imsak: String,
     val fajr: String,
