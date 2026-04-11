@@ -63,7 +63,7 @@ val isSilent = intent.getBooleanExtra(EXTRA_IS_SILENT, false)
             .build()
 
         NotificationManagerCompat.from(context).notify(notifId, notif)
-        NotificationManagerCompat.from(context).cancel(notifId)
+        
     }
 
     companion object {
