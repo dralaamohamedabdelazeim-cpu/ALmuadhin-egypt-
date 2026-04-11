@@ -9,7 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.almuadhin.R
 import com.example.almuadhin.data.AdhanSound
-
+import android.media.MediaPlayer
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -23,7 +23,12 @@ val isSilent = intent.getBooleanExtra(EXTRA_IS_SILENT, false)
         } catch (e: Exception) {
             AdhanSound.MAKKAH
         }
-
+if (!isSilent) {
+    val mp = MediaPlayer.create(context, adhanSound.resId)
+    mp?.isLooping = true
+    mp?.start()
+    AzanMediaPlayer.player = mp
+}
         NotificationHelper.ensureChannels(context, adhanSound)
 
         val openIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
