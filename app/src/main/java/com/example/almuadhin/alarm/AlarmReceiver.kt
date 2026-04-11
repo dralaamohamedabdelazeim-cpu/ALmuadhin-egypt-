@@ -54,7 +54,7 @@ val isSilent = intent.getBooleanExtra(EXTRA_IS_SILENT, false)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSound(if (isSilent) null else soundUri)
-            .setFullScreenIntent(fullScreenPi, true)
+            
             .addAction(0, "إغلاق الأذان", dismissPi)
             .build()
         
