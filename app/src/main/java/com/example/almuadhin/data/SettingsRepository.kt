@@ -28,8 +28,10 @@ class SettingsRepository @Inject constructor(
         val ADS_REMOVED = booleanPreferencesKey("ads_removed")
         val AD_COOLDOWN_MIN = intPreferencesKey("ad_cooldown_min")
         val ADHAN_SOUND = stringPreferencesKey("adhan_sound")
-        val PLAY_FULL_ADHAN = booleanPreferencesKey("play_full_adhan")
-         val SILENT_FAJR = booleanPreferencesKey("silent_fajr")
+        val PLAY_FULL_ADHAN = booleanPreferencesKey("play_full_adhan")   
+        val SILENT_FAJR = booleanPreferencesKey("silent_fajr")
+       val SALAH_ENABLED = booleanPreferencesKey("salah_enabled")
+        val SALAH_INTERVAL = intPreferencesKey("salah_interval")
         // Stored prayer times for rescheduling after reboot
         val LAST_DATE = stringPreferencesKey("last_prayer_date")
         val IMSAK = stringPreferencesKey("last_imsak")
@@ -58,6 +60,8 @@ class SettingsRepository @Inject constructor(
             adhanSound = prefs[Keys.ADHAN_SOUND]
                 ?.let { runCatching { AdhanSound.valueOf(it) }.getOrNull() }
                 ?: AdhanSound.MAKKAH,
+          salahEnabled = prefs[Keys.SALAH_ENABLED] ?: false,
+           salahInterval = prefs[Keys.SALAH_INTERVAL] ?: 30,
             playFullAdhan = prefs[Keys.PLAY_FULL_ADHAN] ?: false,
             silentFajr = prefs[Keys.SILENT_FAJR] ?: false,
         )
@@ -74,6 +78,8 @@ class SettingsRepository @Inject constructor(
             prefs[Keys.CALC_METHOD] = next.calculationMethod.name
             prefs[Keys.NOTIFICATIONS] = next.notificationsEnabled
             prefs[Keys.ADS_REMOVED] = next.adsRemoved
+            prefs[Keys.SALAH_ENABLED] = next.salahEnabled
+            prefs[Keys.SALAH_INTERVAL] = next.salahInterval
             prefs[Keys.AD_COOLDOWN_MIN] = next.adCooldownMinutes
             prefs[Keys.ADHAN_SOUND] = next.adhanSound.name
             prefs[Keys.PLAY_FULL_ADHAN] = next.playFullAdhan
@@ -104,7 +110,12 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setAdhanSound(sound: AdhanSound) =
         context.dataStore.edit { it[Keys.ADHAN_SOUND] = sound.name }
+suspend fun setSalahEnabled(enabled: Boolean) =
+    context.dataStore.edit { it[Keys.SALAH_ENABLED] = enabled }
 
+suspend fun setSalahInterval(minutes: Int) =
+    context.dataStore.edit { it[Keys.SALAH_INTERVAL] = minutes }
+        
     suspend fun setPlayFullAdhan(playFull: Boolean) =
         context.dataStore.edit { it[Keys.PLAY_FULL_ADHAN] = playFull }
 
