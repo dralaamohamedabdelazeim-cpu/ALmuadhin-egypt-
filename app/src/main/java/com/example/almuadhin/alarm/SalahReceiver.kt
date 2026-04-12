@@ -7,11 +7,23 @@ import android.media.MediaPlayer
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.almuadhin.R
+import com.example.almuadhin.data.SettingsRepository
+import com.example.almuadhin.data.SalahSound
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SalahReceiver : BroadcastReceiver() {
 
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
+
     override fun onReceive(context: Context, intent: Intent) {
-        val mp = MediaPlayer.create(context, R.raw.nozaker_salt_ala_habib)
+        val settings = runBlocking { settingsRepository.settingsFlow.first() }
+        val soundResId = settings.salahSound.resId
+
+        val mp = MediaPlayer.create(context, soundResId)
         mp?.start()
         mp?.setOnCompletionListener { it.release() }
 
