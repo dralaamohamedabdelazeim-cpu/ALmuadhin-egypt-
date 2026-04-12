@@ -115,10 +115,10 @@ class SettingsRepository @Inject constructor(
     suspend fun setAdhanSound(sound: AdhanSound) =
         context.dataStore.edit { it[Keys.ADHAN_SOUND] = sound.name }
     suspend fun setSalahEnabled(enabled: Boolean) =
-   suspend fun setSalahSound(sound: SalahSound) =
-    context.dataStore.edit { it[Keys.SALAH_SOUND] = sound.name }
     context.dataStore.edit { it[Keys.SALAH_ENABLED] = enabled }
 
+suspend fun setSalahSound(sound: SalahSound) =
+    context.dataStore.edit { it[Keys.SALAH_SOUND] = sound.name }
 suspend fun setSalahInterval(minutes: Int) =
     context.dataStore.edit { it[Keys.SALAH_INTERVAL] = minutes }
         
