@@ -307,6 +307,10 @@ fun QiblaScreen(
                 }
             } else {
                 ElevatedCard(
+                  onClick = { launcher.launch(arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                 )) },
                     colors = CardDefaults.elevatedCardColors(
                         containerColor = MaterialTheme.colorScheme.errorContainer
                     )
