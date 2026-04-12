@@ -79,6 +79,7 @@
    <receiver
     android:name=".alarm.SalahReceiver"
     android:exported="false" />
+  <service android:name=".alarm.SalahSoundService" />
     </application>
 
 </manifest>
