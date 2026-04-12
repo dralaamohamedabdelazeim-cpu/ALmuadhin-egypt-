@@ -1,4 +1,4 @@
-Enterpackage com.example.almuadhin.alarm
+package com.example.almuadhin.alarm
 
 import android.content.BroadcastReceiver
 import android.content.Context
