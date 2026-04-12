@@ -76,6 +76,9 @@
         <receiver
             android:name=".alarm.DismissReceiver"
             android:exported="false" />
+   <receiver
+    android:name=".alarm.SalahReceiver"
+    android:exported="false" />
     </application>
 
 </manifest>
