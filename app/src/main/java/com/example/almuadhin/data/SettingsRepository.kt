@@ -63,6 +63,9 @@ class SettingsRepository @Inject constructor(
           salahEnabled = prefs[Keys.SALAH_ENABLED] ?: false,
            salahInterval = prefs[Keys.SALAH_INTERVAL] ?: 30,
             playFullAdhan = prefs[Keys.PLAY_FULL_ADHAN] ?: false,
+          salahSound = prefs[Keys.SALAH_SOUND]
+    ?.let { runCatching { SalahSound.valueOf(it) }.getOrNull() }
+    ?: SalahSound.NOZAKER, 
             silentFajr = prefs[Keys.SILENT_FAJR] ?: false,
         )
     }
@@ -77,6 +80,7 @@ class SettingsRepository @Inject constructor(
             prefs[Keys.MANUAL_COUNTRY] = next.manualCountry
             prefs[Keys.CALC_METHOD] = next.calculationMethod.name
             prefs[Keys.NOTIFICATIONS] = next.notificationsEnabled
+            prefs[Keys.SALAH_SOUND] = next.salahSound.name
             prefs[Keys.ADS_REMOVED] = next.adsRemoved
             prefs[Keys.SALAH_ENABLED] = next.salahEnabled
             prefs[Keys.SALAH_INTERVAL] = next.salahInterval
@@ -110,7 +114,9 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setAdhanSound(sound: AdhanSound) =
         context.dataStore.edit { it[Keys.ADHAN_SOUND] = sound.name }
-suspend fun setSalahEnabled(enabled: Boolean) =
+    suspend fun setSalahEnabled(enabled: Boolean) =
+   suspend fun setSalahSound(sound: SalahSound) =
+    context.dataStore.edit { it[Keys.SALAH_SOUND] = sound.name }
     context.dataStore.edit { it[Keys.SALAH_ENABLED] = enabled }
 
 suspend fun setSalahInterval(minutes: Int) =
