@@ -11,10 +11,14 @@ import androidx.core.app.NotificationManagerCompat
 import com.example.almuadhin.R
 import com.example.almuadhin.data.AdhanSound
 import com.example.almuadhin.ui.screens.AzanFullScreenActivity
+import android.telephony.TelephonyManager
 
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        if (telephonyManager.callState != TelephonyManager.CALL_STATE_IDLE) return
+   
         val title = intent.getStringExtra(EXTRA_TITLE) ?: context.getString(R.string.notif_prayer_title)
         val body = intent.getStringExtra(EXTRA_BODY) ?: context.getString(R.string.notif_prayer_body)
         val adhanSoundName = intent.getStringExtra(EXTRA_ADHAN_SOUND) ?: AdhanSound.MAKKAH.name
