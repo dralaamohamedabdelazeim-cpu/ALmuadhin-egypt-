@@ -32,9 +32,12 @@ class AlarmReceiver : BroadcastReceiver() {
 
         if (!isSilent) {
             val mp = MediaPlayer.create(context, adhanSound.resId)
-            mp?.isLooping = true
+            mp?.isLooping = false
             mp?.start()
             AzanMediaPlayer.player = mp
+        }mp?.setOnCompletionListener {
+    it.release()
+    AzanMediaPlayer.player = null
         }
 
         NotificationHelper.ensureChannels(context, adhanSound)
