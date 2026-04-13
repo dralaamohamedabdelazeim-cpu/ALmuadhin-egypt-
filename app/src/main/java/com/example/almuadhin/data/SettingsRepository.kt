@@ -50,8 +50,8 @@ class SettingsRepository @Inject constructor(
             locationMode = prefs[Keys.LOCATION_MODE]
                 ?.let { runCatching { LocationMode.valueOf(it) }.getOrNull() }
                 ?: LocationMode.AUTO,
-            manualCity = prefs[Keys.MANUAL_CITY] ?: "المنامة",
-            manualCountry = prefs[Keys.MANUAL_COUNTRY] ?: "البحرين",
+            manualCity = prefs[Keys.MANUAL_CITY] ?: "",   //
+            manualCountry = prefs[Keys.MANUAL_COUNTRY] ?: "",   //
             calculationMethod = prefs[Keys.CALC_METHOD]
                 ?.let { runCatching { CalculationMethod.valueOf(it) }.getOrNull() }
                 ?: CalculationMethod.UMM_AL_QURA,
