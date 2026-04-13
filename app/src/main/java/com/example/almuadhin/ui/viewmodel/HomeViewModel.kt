@@ -30,7 +30,7 @@ data class HomeUiState(
     val nextPrayerTime: String? = null,
     val countdown: String? = null,
     val isOffline: Boolean = false,
-    val lastUpdated: String? = null
+    val lastUpdated: String? = null, 
    val cityName: String? = null,
   )
 
