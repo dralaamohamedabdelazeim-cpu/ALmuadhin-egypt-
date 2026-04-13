@@ -302,7 +302,7 @@ fun HomeScreen(
                             val locationText = if (state.settings.locationMode == LocationMode.MANUAL) {
                                  "${state.settings.manualCity}، ${state.settings.manualCountry}"
                             } else {
-                                 state.day?.timezone?.substringAfter("/")?.replace("_", " ") ?: "الموقع تلقائي"
+                            state.cityName ?: state.day?.timezone?.substringAfter("/")?.replace("_", " ") ?: "الموقع التلقائي"
                             }
                             
                             Text(
