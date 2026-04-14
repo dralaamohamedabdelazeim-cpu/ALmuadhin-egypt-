@@ -43,6 +43,10 @@ class SettingsRepository @Inject constructor(
         val SALAH_ENABLED = booleanPreferencesKey("salah_enabled")
         val SALAH_INTERVAL = intPreferencesKey("salah_interval")
         val SALAH_SOUND = stringPreferencesKey("salah_sound")
+       val CACHED_LAT = stringPreferencesKey("cached_lat")
+       val CACHED_LNG = stringPreferencesKey("cached_lng")
+       val CACHED_CITY = stringPreferencesKey("cached_city")
+       val LAST_PRAYER_UPDATE = stringPreferencesKey("last_prayer_update")
     }
 
     val settingsFlow: Flow<UserSettings> = context.dataStore.data.map { prefs ->
@@ -91,6 +95,7 @@ class SettingsRepository @Inject constructor(
             Pair(date, day)
         }
 
+
     suspend fun getSettings(): UserSettings = settingsFlow.first()
 
     suspend fun updateSettings(update: (UserSettings) -> UserSettings) {
@@ -111,6 +116,21 @@ class SettingsRepository @Inject constructor(
             prefs[Keys.SALAH_SOUND] = next.salahSound.name
             prefs[Keys.SALAH_INTERVAL] = next.salahInterval
         }
+    }
+
+    suspend fun saveLocationCache(lat: Double, lng: Double, city: String) =
+        context.dataStore.edit {
+            it[Keys.CACHED_LAT] = lat.toString()
+            it[Keys.CACHED_LNG] = lng.toString()
+            it[Keys.CACHED_CITY] = city
+        }
+
+    suspend fun getLocationCache(): Triple<Double, Double, String>? {
+        val prefs = context.dataStore.data.first()
+        val lat = prefs[Keys.CACHED_LAT]?.toDoubleOrNull() ?: return null
+        val lng = prefs[Keys.CACHED_LNG]?.toDoubleOrNull() ?: return null
+        val city = prefs[Keys.CACHED_CITY] ?: return null
+        return Triple(lat, lng, city)
     }
 
     suspend fun setLocationMode(mode: LocationMode) =
@@ -168,4 +188,13 @@ class SettingsRepository @Inject constructor(
 
     suspend fun getLastPrayerTimes(): PrayerDay? =
         storedPrayerDayFlow.first()?.second
+
+    suspend fun savePrayerUpdateDate(dateIso: String) =
+        context.dataStore.edit { it[Keys.LAST_PRAYER_UPDATE] = dateIso }
+
+    suspend fun getLastPrayerUpdateDate(): String? {
+        val prefs = context.dataStore.data.first()
+        return prefs[Keys.LAST_PRAYER_UPDATE]
+    }
+
 }
