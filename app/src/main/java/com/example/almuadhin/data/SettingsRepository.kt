@@ -12,13 +12,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.example.almuadhin.data.SalahSound
+
 private val Context.dataStore by preferencesDataStore(name = "muadhin_settings")
 
 @Singleton
 class SettingsRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+
     private object Keys {
         val LOCATION_MODE = stringPreferencesKey("location_mode")
         val MANUAL_CITY = stringPreferencesKey("manual_city")
@@ -28,9 +29,8 @@ class SettingsRepository @Inject constructor(
         val ADS_REMOVED = booleanPreferencesKey("ads_removed")
         val AD_COOLDOWN_MIN = intPreferencesKey("ad_cooldown_min")
         val ADHAN_SOUND = stringPreferencesKey("adhan_sound")
-        val PLAY_FULL_ADHAN = booleanPreferencesKey("play_full_adhan")   
+        val PLAY_FULL_ADHAN = booleanPreferencesKey("play_full_adhan")
         val SILENT_FAJR = booleanPreferencesKey("silent_fajr")
-        // Stored prayer times for rescheduling after reboot
         val LAST_DATE = stringPreferencesKey("last_prayer_date")
         val IMSAK = stringPreferencesKey("last_imsak")
         val FAJR = stringPreferencesKey("last_fajr")
@@ -50,8 +50,8 @@ class SettingsRepository @Inject constructor(
             locationMode = prefs[Keys.LOCATION_MODE]
                 ?.let { runCatching { LocationMode.valueOf(it) }.getOrNull() }
                 ?: LocationMode.AUTO,
-            manualCity = prefs[Keys.MANUAL_CITY] ?: "",   //
-            manualCountry = prefs[Keys.MANUAL_COUNTRY] ?: "",   //
+            manualCity = prefs[Keys.MANUAL_CITY] ?: "",
+            manualCountry = prefs[Keys.MANUAL_COUNTRY] ?: "",
             calculationMethod = prefs[Keys.CALC_METHOD]
                 ?.let { runCatching { CalculationMethod.valueOf(it) }.getOrNull() }
                 ?: CalculationMethod.UMM_AL_QURA,
@@ -61,19 +61,22 @@ class SettingsRepository @Inject constructor(
             adhanSound = prefs[Keys.ADHAN_SOUND]
                 ?.let { runCatching { AdhanSound.valueOf(it) }.getOrNull() }
                 ?: AdhanSound.MAKKAH,
-          salahEnabled = prefs[Keys.SALAH_ENABLED] ?: false,
-           salahInterval = prefs[Keys.SALAH_INTERVAL] ?: 30,
-         salahSound = runCatching {
-            prefs[Keys.SALAH_SOUND]?.let { SalahSound.valueOf(it) }
-        }.getOrNull() ?: SalahSound.NOZAKER,
             silentFajr = prefs[Keys.SILENT_FAJR] ?: false,
+            playFullAdhan = prefs[Keys.PLAY_FULL_ADHAN] ?: false,
+            salahEnabled = prefs[Keys.SALAH_ENABLED] ?: false,
+            salahSound = prefs[Keys.SALAH_SOUND]
+                ?.let { runCatching { SalahSound.valueOf(it) }.getOrNull() }
+                ?: SalahSound.NOZAKER,
+            salahInterval = prefs[Keys.SALAH_INTERVAL] ?: 30,
         )
     }
 
+    suspend fun getSettings(): UserSettings = settingsFlow.first()
+
+    // ← دالة updateSettings الأساسية
     suspend fun updateSettings(update: (UserSettings) -> UserSettings) {
         val current = settingsFlow.first()
         val next = update(current)
-
         context.dataStore.edit { prefs ->
             prefs[Keys.LOCATION_MODE] = next.locationMode.name
             prefs[Keys.MANUAL_CITY] = next.manualCity
@@ -114,21 +117,23 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setAdhanSound(sound: AdhanSound) =
         context.dataStore.edit { it[Keys.ADHAN_SOUND] = sound.name }
-    suspend fun setSalahEnabled(enabled: Boolean) =
-        context.dataStore.edit { it[Keys.SALAH_ENABLED] = enabled }
 
-suspend fun setSalahSound(sound: SalahSound) =
-    context.dataStore.edit { it[Keys.SALAH_SOUND] = sound.name }
+    suspend fun setSilentFajr(silent: Boolean) =
+        context.dataStore.edit { it[Keys.SILENT_FAJR] = silent }
 
-    suspend fun setSalahInterval(minutes: Int) =
-    context.dataStore.edit { it[Keys.SALAH_INTERVAL] = minutes }
-        
     suspend fun setPlayFullAdhan(playFull: Boolean) =
         context.dataStore.edit { it[Keys.PLAY_FULL_ADHAN] = playFull }
 
-    suspend fun setSilentFajr(silent: Boolean) =
-    context.dataStore.edit { it[Keys.SILENT_FAJR] = silent }
+    suspend fun setSalahEnabled(enabled: Boolean) =
+        context.dataStore.edit { it[Keys.SALAH_ENABLED] = enabled }
 
+    suspend fun setSalahSound(sound: SalahSound) =
+        context.dataStore.edit { it[Keys.SALAH_SOUND] = sound.name }
+
+    suspend fun setSalahInterval(minutes: Int) =
+        context.dataStore.edit { it[Keys.SALAH_INTERVAL] = minutes }
+
+    // ← دالة حفظ مواقيت الصلاة للـ reschedule
     suspend fun savePrayerDayForReschedule(dateIso: String, day: PrayerDay) {
         context.dataStore.edit { prefs ->
             prefs[Keys.LAST_DATE] = dateIso
@@ -143,27 +148,19 @@ suspend fun setSalahSound(sound: SalahSound) =
         }
     }
 
-    val storedPrayerDayFlow: Flow<Pair<String, PrayerDay>?> = context.dataStore.data.map { prefs ->
-        val date = prefs[Keys.LAST_DATE] ?: return@map null
-        val tz = prefs[Keys.TIMEZONE] ?: "UTC"
-        val imsak = prefs[Keys.IMSAK] ?: return@map null
-        val fajr = prefs[Keys.FAJR] ?: return@map null
-        val sunrise = prefs[Keys.SUNRISE] ?: return@map null
-        val dhuhr = prefs[Keys.DHUHR] ?: return@map null
-        val asr = prefs[Keys.ASR] ?: return@map null
-        val maghrib = prefs[Keys.MAGHRIB] ?: return@map null
-        val isha = prefs[Keys.ISHA] ?: return@map null
-
-        date to PrayerDay(
-            imsak = imsak,
-            fajr = fajr,
-            sunrise = sunrise,
-            dhuhr = dhuhr,
-            asr = asr,
-            maghrib = maghrib,
-            isha = isha,
-            timezone = tz,
-            gregorianDate = "",
+    suspend fun getLastPrayerTimes(): PrayerDay? {
+        val prefs = context.dataStore.data.first()
+        val date = prefs[Keys.LAST_DATE] ?: return null
+        return PrayerDay(
+            imsak = prefs[Keys.IMSAK] ?: return null,
+            fajr = prefs[Keys.FAJR] ?: return null,
+            sunrise = prefs[Keys.SUNRISE] ?: return null,
+            dhuhr = prefs[Keys.DHUHR] ?: return null,
+            asr = prefs[Keys.ASR] ?: return null,
+            maghrib = prefs[Keys.MAGHRIB] ?: return null,
+            isha = prefs[Keys.ISHA] ?: return null,
+            timezone = prefs[Keys.TIMEZONE] ?: return null,
+            gregorianDate = date,
             hijriDate = "",
             hijriMonthNumber = 0
         )
