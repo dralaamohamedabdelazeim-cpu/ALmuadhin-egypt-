@@ -71,9 +71,28 @@ class SettingsRepository @Inject constructor(
         )
     }
 
+    // ← ده اللي بيناديه HomeViewModel و PrayerAlarmScheduler
+    val storedPrayerDayFlow: Flow<Pair<String, PrayerDay>?> =
+        context.dataStore.data.map { prefs ->
+            val date = prefs[Keys.LAST_DATE] ?: return@map null
+            val day = PrayerDay(
+                imsak = prefs[Keys.IMSAK] ?: return@map null,
+                fajr = prefs[Keys.FAJR] ?: return@map null,
+                sunrise = prefs[Keys.SUNRISE] ?: return@map null,
+                dhuhr = prefs[Keys.DHUHR] ?: return@map null,
+                asr = prefs[Keys.ASR] ?: return@map null,
+                maghrib = prefs[Keys.MAGHRIB] ?: return@map null,
+                isha = prefs[Keys.ISHA] ?: return@map null,
+                timezone = prefs[Keys.TIMEZONE] ?: return@map null,
+                gregorianDate = date,
+                hijriDate = "",
+                hijriMonthNumber = 0
+            )
+            Pair(date, day)
+        }
+
     suspend fun getSettings(): UserSettings = settingsFlow.first()
 
-    // ← دالة updateSettings الأساسية
     suspend fun updateSettings(update: (UserSettings) -> UserSettings) {
         val current = settingsFlow.first()
         val next = update(current)
@@ -133,7 +152,6 @@ class SettingsRepository @Inject constructor(
     suspend fun setSalahInterval(minutes: Int) =
         context.dataStore.edit { it[Keys.SALAH_INTERVAL] = minutes }
 
-    // ← دالة حفظ مواقيت الصلاة للـ reschedule
     suspend fun savePrayerDayForReschedule(dateIso: String, day: PrayerDay) {
         context.dataStore.edit { prefs ->
             prefs[Keys.LAST_DATE] = dateIso
@@ -148,21 +166,6 @@ class SettingsRepository @Inject constructor(
         }
     }
 
-    suspend fun getLastPrayerTimes(): PrayerDay? {
-        val prefs = context.dataStore.data.first()
-        val date = prefs[Keys.LAST_DATE] ?: return null
-        return PrayerDay(
-            imsak = prefs[Keys.IMSAK] ?: return null,
-            fajr = prefs[Keys.FAJR] ?: return null,
-            sunrise = prefs[Keys.SUNRISE] ?: return null,
-            dhuhr = prefs[Keys.DHUHR] ?: return null,
-            asr = prefs[Keys.ASR] ?: return null,
-            maghrib = prefs[Keys.MAGHRIB] ?: return null,
-            isha = prefs[Keys.ISHA] ?: return null,
-            timezone = prefs[Keys.TIMEZONE] ?: return null,
-            gregorianDate = date,
-            hijriDate = "",
-            hijriMonthNumber = 0
-        )
-    }
+    suspend fun getLastPrayerTimes(): PrayerDay? =
+        storedPrayerDayFlow.first()?.second
 }
