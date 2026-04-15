@@ -71,7 +71,7 @@ class HomeViewModel @Inject constructor(
             val s = settingsRepo.settingsFlow.first()
             try {
                 val cachedLoc = settingsRepo.getLocationCache()
-if (cachedLoc != null) {
+if (cachedLoc != null) {  //
     // استخدم الموقع المحفوظ بدون GPS
     prayerRepo.getPrayerDayByCoordinates(date, cachedLoc.first, cachedLoc.second, s.calculationMethod)
 } else {
@@ -142,7 +142,7 @@ if (cachedLoc != null) {
             val day = runCatching {
            if (s.locationMode == LocationMode.AUTO) {
     val cachedLoc = settingsRepo.getLocationCache()
-    if (cachedLoc != null) {
+    if (cachedLoc != null) {  //
         prayerRepo.getPrayerDayByCoordinates(date, cachedLoc.first, cachedLoc.second, s.calculationMethod)
     } else {
         val loc = locationRepo.getLastKnownLocation()
