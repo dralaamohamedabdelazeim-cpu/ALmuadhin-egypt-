@@ -136,13 +136,25 @@ class HomeViewModel @Inject constructor(
 
             val date = TimeUtils.todayDdMmYyyy(zoneId)
             val day = runCatching {
-                if (s.locationMode == LocationMode.AUTO) {
-                    val loc = locationRepo.getLastKnownLocation()
-                    if (loc != null) {
-                        prayerRepo.getPrayerDayByCoordinates(date, loc.latitude, loc.longitude, s.calculationMethod)
-                    } else {
-                        prayerRepo.getPrayerDayByCity(date, s.manualCity, s.manualCountry, s.calculationMethod)
-                    }
+           if (s.locationMode == LocationMode.AUTO) {
+    val cachedLoc = settingsRepo.getLocationCache()
+    if (cachedLoc != null) {
+        prayerRepo.getPrayerDayByCoordinates(date, cachedLoc.first, cachedLoc.second, s.calculationMethod)
+    } else {
+        val loc = locationRepo.getLastKnownLocation()
+        if (loc != null) {
+            val geocoder = android.location.Geocoder(context, java.util.Locale("ar"))
+            val address = geocoder.getFromLocation(loc.latitude, loc.longitude, 1)
+            val city = address?.firstOrNull()?.locality
+                ?: address?.firstOrNull()?.subAdminArea
+                ?: address?.firstOrNull()?.adminArea ?: ""
+            settingsRepo.saveLocationCache(loc.latitude, loc.longitude, city)
+            _state.value = _state.value.copy(cityName = city)
+            prayerRepo.getPrayerDayByCoordinates(date, loc.latitude, loc.longitude, s.calculationMethod)
+        } else {
+            prayerRepo.getPrayerDayByCity(date, s.manualCity, s.manualCountry, s.calculationMethod)
+        }
+    }
                 } else {
                     prayerRepo.getPrayerDayByCity(date, s.manualCity, s.manualCountry, s.calculationMethod)
                 }
