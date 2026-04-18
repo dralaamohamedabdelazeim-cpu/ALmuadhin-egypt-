@@ -665,7 +665,6 @@ item {
         }
     }
 }
-}
             // App Info
             item {
                 SettingsCard(
