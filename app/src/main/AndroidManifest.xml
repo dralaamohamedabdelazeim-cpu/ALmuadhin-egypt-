@@ -80,6 +80,8 @@
     android:name=".alarm.SalahReceiver"
     android:exported="false" />
   <service android:name=".alarm.SalahSoundService" />
+ <service android:name=".alarm.ZekrService" />
+<receiver android:name=".alarm.ZekrReceiver" android:exported="false" />
     </application>
 
 </manifest>
