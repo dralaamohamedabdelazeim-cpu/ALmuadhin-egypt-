@@ -36,7 +36,7 @@ enum class SalahSound(val resId: Int, val labelAr: String) {
    val salahCurrentIndex: Int = 0,
    val salahVolume: Float = 1.0f,
 }
-
+}
 data class UserSettings(
     val locationMode: LocationMode = LocationMode.AUTO,
     val manualCity: String = "",
