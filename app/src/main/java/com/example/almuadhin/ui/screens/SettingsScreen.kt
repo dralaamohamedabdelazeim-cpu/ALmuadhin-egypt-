@@ -38,6 +38,9 @@ import com.example.almuadhin.noor.config.ConfigManager
 import com.example.almuadhin.noor.data.ApiProvider
 import com.example.almuadhin.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.EntryPointAccessors
+import com.example.almuadhin.data.ZekrData
+import com.example.almuadhin.data.ZekrPrefs
+import com.example.almuadhin.alarm.ZekrScheduler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
