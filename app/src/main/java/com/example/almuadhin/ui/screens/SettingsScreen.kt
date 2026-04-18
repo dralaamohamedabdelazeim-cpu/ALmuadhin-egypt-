@@ -426,7 +426,7 @@ fun SettingsScreen(
                         }
                     }
                 }
-            }
+           
 // Silent Fajr Setting
             item {
                 SettingsCard(
