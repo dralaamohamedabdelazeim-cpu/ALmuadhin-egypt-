@@ -97,7 +97,7 @@ class HomeViewModel @Inject constructor(
             lastUpdated = "محفوظ مسبقاً",
             error = null
         )
-        computeNext(day)
+        day?.let { computeNext(it) }
         } else {
             // Fallback to legacy DataStore cache
             val cached = settingsRepo.storedPrayerDayFlow.first()
