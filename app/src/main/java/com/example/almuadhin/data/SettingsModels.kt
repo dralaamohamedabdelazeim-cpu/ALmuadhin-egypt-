@@ -31,7 +31,6 @@ enum class SalahSound(val resId: Int, val labelAr: String) {
     LAHAWLA(R.raw.lahawla_wlaqowat, "لا حول ولا قوة إلا بالله"),
     ALLAHOM_ALHAMD(R.raw.allahom_lk_alhamd, "اللهم لك الحمد"),
     RBNA_IGHFER(R.raw.rbna_ighfer_li, "ربنا اغفر لي")
-   val salahInterval: Int = 30,
    
 }
 data class UserSettings(
@@ -47,7 +46,6 @@ data class UserSettings(
     val playFullAdhan: Boolean = false,
     val salahEnabled: Boolean = false,
     val salahSound: SalahSound = SalahSound.NOZAKER,
-    val salahInterval: Int = 30,
     val salahInterval: Int = 30,
     val salahSequential: Boolean = false,
     val salahCurrentIndex: Int = 0,
