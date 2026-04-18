@@ -26,7 +26,7 @@ enum class AdhanSound(val resId: Int, val labelAr: String, val isFull: Boolean =
 enum class SalahSound(val resId: Int, val labelAr: String) {
     NOZAKER(R.raw.nozaker_salt_ala_habib, "نذكركم بالصلاة على الحبيب"),
     AYAH(R.raw.ayah_elahzab, "آية الأحزاب"),
-    SOBHANALLAH(R.raw.sobhanallah_wabehemdeh, "سبحان الله وبحمده"),
+    SOBHANALLAH(R.raw.sobhanallah_wabehamdeh, "سبحان الله وبحمده"),
     ALHAMDO(R.raw.alhamdo_lelah, "الحمد لله"),
     LAHAWLA(R.raw.lahawla_wlaqowat, "لا حول ولا قوة إلا بالله"),
     ALLAHOM_ALHAMD(R.raw.allahom_lk_alhamd, "اللهم لك الحمد"),
