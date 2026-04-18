@@ -18,50 +18,50 @@ import kotlin.coroutines.resume
 class LocationRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-
     private val fused = LocationServices.getFusedLocationProviderClient(context)
+    private val prefs = context.getSharedPreferences("location_cache", Context.MODE_PRIVATE)
 
     @SuppressLint("MissingPermission")
     suspend fun getLastKnownLocation(): android.location.Location? {
-        return try {
-            val task = fused.lastLocation
-            val last = suspendCancellableCoroutine<android.location.Location?> { cont ->
-                task.addOnSuccessListener { location ->
-                    cont.resume(location)
-                }
-                task.addOnFailureListener {
-                    cont.resume(null)
-                }
-            }
-            if (last != null) last else getCurrentLocation()
-        } catch (e: Exception) {
-            getCurrentLocation()
+        val cachedLat = prefs.getFloat("lat", 0f)
+        val cachedLng = prefs.getFloat("lng", 0f)
+        val cacheValid = cachedLat != 0f && cachedLng != 0f
+
+        if (cacheValid) {
+            val cached = android.location.Location("cache")
+            cached.latitude = cachedLat.toDouble()
+            cached.longitude = cachedLng.toDouble()
+            return cached
         }
+        return fetchAndCache()
     }
 
     @SuppressLint("MissingPermission")
-    private suspend fun getCurrentLocation(): android.location.Location? =
+    private suspend fun fetchAndCache(): android.location.Location? =
         suspendCancellableCoroutine { cont ->
             val request = LocationRequest.Builder(
-                Priority.PRIORITY_HIGH_ACCURACY, 5000L
+                Priority.PRIORITY_HIGH_ACCURACY, 10000L
             )
-                .setMaxUpdates(1)
-                .setMinUpdateDistanceMeters(0f)
-                .setWaitForAccurateLocation(true)
-                .build()
+            .setMaxUpdates(1)
+            .setWaitForAccurateLocation(true)
+            .setMinUpdateDistanceMeters(0f)
+            .build()
 
             val callback = object : LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
                     fused.removeLocationUpdates(this)
+                    result.lastLocation?.let { save(it) }
                     cont.resume(result.lastLocation)
                 }
             }
-
             fused.requestLocationUpdates(request, callback, Looper.getMainLooper())
-
-            cont.invokeOnCancellation {
-                fused.removeLocationUpdates(callback)
-            }
+            cont.invokeOnCancellation { fused.removeLocationUpdates(callback) }
         }
 
+    private fun save(loc: android.location.Location) {
+        prefs.edit()
+            .putFloat("lat", loc.latitude.toFloat())
+            .putFloat("lng", loc.longitude.toFloat())
+            .apply()
+    }
 }
