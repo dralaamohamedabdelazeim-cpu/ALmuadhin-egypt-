@@ -747,7 +747,6 @@ item {
             }
         }
     }
-}
 
 @Composable
 private fun SettingsCard(
