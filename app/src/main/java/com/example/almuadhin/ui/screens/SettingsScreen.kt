@@ -508,64 +508,159 @@ fun SettingsScreen(
          //   item {
         //        NoorSettingsCard()
         //    }
-// Salah Settings
+// Zekr Settings
 item {
+    val ctx = LocalContext.current
+    var zekrEnabled by remember { mutableStateOf(ZekrPrefs.isEnabled(ctx)) }
+    var selectedInterval by remember { mutableStateOf(ZekrPrefs.getIntervalInMinutes(ctx)) }
+    var playbackMode by remember { mutableStateOf(ZekrPrefs.getPlaybackMode(ctx)) }
+    var selectedRepeatIndex by remember { mutableStateOf(ZekrPrefs.getRepeatIndex(ctx)) }
+    var zekrVolume by remember { mutableStateOf(ZekrPrefs.getVolume(ctx)) }
+    var dhikrMenuExpanded by remember { mutableStateOf(false) }
+    val intervals = listOf(10, 15, 20, 30, 60, 120)
+
     SettingsCard(
-        title = "الصلاة على النبي ﷺ",
+        title = "الأذكار الصوتية 🤲",
         icon = Icons.Default.Favorite
     ) {
+        // تفعيل
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("تفعيل الصلاة على النبي")
+            Text(if (zekrEnabled) "الأذكار مفعلة ✅" else "الأذكار متوقفة 🔴",
+                fontWeight = FontWeight.Bold)
             Switch(
-                checked = s.salahEnabled,
-                onCheckedChange = {
-                    vm.setSalahEnabled(it)
-                    if (it) scheduler.scheduleSalah(s.salahInterval)
-                    else scheduler.cancelSalah()
+                checked = zekrEnabled,
+                onCheckedChange = { v ->
+                    zekrEnabled = v
+                    ZekrPrefs.setEnabled(ctx, v)
+                    if (v) ZekrScheduler.schedule(ctx, selectedInterval.toLong())
+                    else ZekrScheduler.cancel(ctx)
+                }
+            )
+        }
+
+        if (zekrEnabled) {
+            Spacer(Modifier.height(8.dp))
+
+            // الفترة الزمنية
+            Text("الفترة الزمنية بين الأذكار",
+                style = MaterialTheme.typography.bodySmall)
+            Spacer(Modifier.height(4.dp))
+            ExposedDropdownMenuBox(
+                expanded = false,
+                onExpandedChange = {}
+            ) {
+                var expanded2 by remember { mutableStateOf(false) }
+                OutlinedTextField(
+                    value = "$selectedInterval دقيقة",
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded2) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded2,
+                    onDismissRequest = { expanded2 = false }
+                ) {
+                    intervals.forEach { min ->
+                        DropdownMenuItem(
+                            text = { Text("$min دقيقة") },
+                            onClick = {
+                                selectedInterval = min
+                                ZekrPrefs.setIntervalInMinutes(ctx, min)
+                                if (zekrEnabled) ZekrScheduler.schedule(ctx, min.toLong())
+                                expanded2 = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // طريقة التشغيل
+            Text("طريقة التشغيل",
+                style = MaterialTheme.typography.bodySmall)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(if (playbackMode == 0) "تسلسل (دور)" else "تكرار ذكر محدد",
+                    fontWeight = FontWeight.Bold)
+                Switch(
+                    checked = playbackMode == 1,
+                    onCheckedChange = {
+                        playbackMode = if (it) 1 else 0
+                        ZekrPrefs.setPlaybackMode(ctx, playbackMode)
+                    }
+                )
+            }
+
+            // اختيار ذكر للتكرار
+            if (playbackMode == 1) {
+                Spacer(Modifier.height(8.dp))
+                Text("اختر الذكر للتكرار",
+                    style = MaterialTheme.typography.bodySmall)
+                ExposedDropdownMenuBox(
+                    expanded = dhikrMenuExpanded,
+                    onExpandedChange = { dhikrMenuExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = if (selectedRepeatIndex < ZekrData.zekrList.size)
+                            ZekrData.zekrList[selectedRepeatIndex].name
+                        else "اختر ذكر...",
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dhikrMenuExpanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = dhikrMenuExpanded,
+                        onDismissRequest = { dhikrMenuExpanded = false }
+                    ) {
+                        ZekrData.zekrList.forEachIndexed { index, zekr ->
+                            DropdownMenuItem(
+                                text = { Text(zekr.name) },
+                                onClick = {
+                                    selectedRepeatIndex = index
+                                    ZekrPrefs.setRepeatIndex(ctx, index)
+                                    dhikrMenuExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // التحكم في الصوت
+            Text("مستوى الصوت 🔊",
+                style = MaterialTheme.typography.bodySmall)
+            Slider(
+                value = zekrVolume,
+                onValueChange = {
+                    zekrVolume = it
+                    ZekrPrefs.setVolume(ctx, it)
                 },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
-                    checkedTrackColor = MaterialTheme.colorScheme.primary
+                valueRange = 0f..1f,
+                steps = 9,
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary
                 )
             )
+            Text("${(zekrVolume * 100).toInt()}%",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center)
         }
-        if (s.salahEnabled) {
-            Spacer(Modifier.height(8.dp))
-            Text("كل ${s.salahInterval} دقيقة")
-            Slider(
-                value = s.salahInterval.toFloat(),
-                onValueChange = {
-                    vm.setSalahInterval(it.toInt())
-                    scheduler.scheduleSalah(it.toInt())
-                },
-                valueRange = 10f..60f,
-                steps = 4
-            )
-     Spacer(Modifier.height(8.dp))
-Text("اختر الصوت")
-SalahSound.values().forEach { sound ->
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { 
-        playingSalahSound = sound
-        vm.setSalahSound(sound) 
-   },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = s.salahSound == sound,
-            onClick = { vm.setSalahSound(sound) }
-        )
-        Text(sound.labelAr)
     }
 }
-        }
-    }
 }
             // App Info
             item {
