@@ -3,9 +3,15 @@ package com.example.almuadhin.alarm
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 
 class ZekrReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        context.startService(Intent(context, ZekrService::class.java))
+        val serviceIntent = Intent(context, ZekrService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(serviceIntent)
+        } else {
+            context.startService(serviceIntent)
+        }
     }
 }
