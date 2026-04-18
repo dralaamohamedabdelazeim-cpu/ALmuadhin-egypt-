@@ -32,10 +32,7 @@ enum class SalahSound(val resId: Int, val labelAr: String) {
     ALLAHOM_ALHAMD(R.raw.allahom_lk_alhamd, "اللهم لك الحمد"),
     RBNA_IGHFER(R.raw.rbna_ighfer_li, "ربنا اغفر لي")
    val salahInterval: Int = 30,
-   val salahSequential: Boolean = false,
-   val salahCurrentIndex: Int = 0,
-   val salahVolume: Float = 1.0f,
-}
+   
 }
 data class UserSettings(
     val locationMode: LocationMode = LocationMode.AUTO,
@@ -51,6 +48,10 @@ data class UserSettings(
     val salahEnabled: Boolean = false,
     val salahSound: SalahSound = SalahSound.NOZAKER,
     val salahInterval: Int = 30,
+    val salahInterval: Int = 30,
+    val salahSequential: Boolean = false,
+    val salahCurrentIndex: Int = 0,
+    val salahVolume: Float = 1.0f,
 )
 
 data class PrayerDay(
