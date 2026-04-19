@@ -44,6 +44,13 @@ import com.example.almuadhin.data.ZekrPrefs
 import com.example.almuadhin.alarm.ZekrScheduler
 import androidx.compose.ui.text.style.TextAlign
 
+// Hilt EntryPoint to access scheduler from composable
+@dagger.hilt.EntryPoint
+@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
+interface SchedulerEntryPoint {
+    fun scheduler(): PrayerAlarmScheduler
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -800,13 +807,6 @@ private fun SettingsCard(
             content()
         }
     }
-}
-
-// Hilt EntryPoint to access scheduler from composable
-@dagger.hilt.EntryPoint
-@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
-interface SchedulerEntryPoint {
-    fun scheduler(): PrayerAlarmScheduler
 }
 
 @Composable
