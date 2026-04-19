@@ -67,8 +67,11 @@ class ZekrService : Service() {
     private fun playZekr() {
         val ctx = applicationContext
         val playbackMode = ZekrPrefs.getPlaybackMode(ctx)
-        val volume = ZekrPrefs.getVolume(ctx)
 
+        // قراءة مستوى الصوت من الإعدادات (0.0 - 1.0)
+        val volumeFraction = ZekrPrefs.getVolume(ctx)
+
+        // تحديد ملف الصوت
         val resId = if (playbackMode == 1) {
             val repeatIndex = ZekrPrefs.getRepeatIndex(ctx)
             if (repeatIndex < ZekrData.zekrList.size)
@@ -85,11 +88,13 @@ class ZekrService : Service() {
             mediaPlayer = MediaPlayer.create(ctx, resId)?.apply {
                 setAudioAttributes(
                     AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setLegacyStreamType(AudioManager.STREAM_MUSIC)
                         .build()
                 )
-                setVolume(volume, volume)
+                // التحكم في صوت الـ MediaPlayer مباشرة بدون تغيير صوت الجهاز
+                setVolume(volumeFraction, volumeFraction)
                 setOnCompletionListener {
                     it.release()
                     mediaPlayer = null
