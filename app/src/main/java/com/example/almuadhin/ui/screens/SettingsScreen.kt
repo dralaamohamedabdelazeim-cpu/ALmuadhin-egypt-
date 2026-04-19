@@ -522,12 +522,10 @@ fun SettingsScreen(
                 var selectedRepeatIndex by remember { mutableStateOf(ZekrPrefs.getRepeatIndex(zekrCtx)) }
                 var dhikrMenuExpanded by remember { mutableStateOf(false) }
                 var intervalMenuExpanded by remember { mutableStateOf(false) }
-                val intervals = listOf(1, 5, 10, 15, 20, 30, 60, 120)
+                val intervals = listOf(10, 15, 20, 30, 60, 120)
 
                 var zekrVolume by remember {
-                    mutableStateOf(
-                        audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat() / maxVolume.toFloat()
-                    )
+                    mutableStateOf(ZekrPrefs.getVolume(zekrCtx))
                 }
 
                 SettingsCard(
@@ -655,12 +653,9 @@ fun SettingsScreen(
                             value = zekrVolume,
                             onValueChange = { newVal ->
                                 zekrVolume = newVal
-                                val newStreamVolume = (newVal * maxVolume).toInt().coerceIn(0, maxVolume)
-                                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newStreamVolume, 0)
                                 ZekrPrefs.setVolume(zekrCtx, newVal)
                             },
                             valueRange = 0f..1f,
-                            steps = 9,
                             colors = SliderDefaults.colors(
                                 thumbColor = MaterialTheme.colorScheme.primary,
                                 activeTrackColor = MaterialTheme.colorScheme.primary
