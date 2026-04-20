@@ -83,6 +83,13 @@
   <service android:name=".alarm.SalahSoundService" />
  <service android:name=".alarm.ZekrService" />
 <receiver android:name=".alarm.ZekrReceiver" android:exported="false" />
+   <receiver
+    android:name=".alarm.PhoneStateReceiver"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="android.intent.action.PHONE_STATE" />
+    </intent-filter>
+</receiver>
     </application>
 
 </manifest>
