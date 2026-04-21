@@ -35,9 +35,10 @@ class ZekrService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val ctx = applicationContext
 
-       // لو في مكالمة → أجل الذكر 5 دقايق وامشي
+       // لو في مكالمة عادية أو نت → أجل الذكر 5 دقايق وامشي
 val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-if (tm.callState != TelephonyManager.CALL_STATE_IDLE) {
+val am = getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+if (tm.callState != TelephonyManager.CALL_STATE_IDLE || am.mode == android.media.AudioManager.MODE_IN_COMMUNICATION) {
     ZekrScheduler.schedule(ctx, 5)
     stopSelf()
     return START_NOT_STICKY
