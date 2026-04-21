@@ -14,6 +14,7 @@ import android.telephony.TelephonyManager
 import com.example.almuadhin.R
 import com.example.almuadhin.data.ZekrData
 import com.example.almuadhin.data.ZekrPrefs
+import kotlin.math.pow
 
 class ZekrService : Service() {
 
