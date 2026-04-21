@@ -35,12 +35,13 @@ class ZekrService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val ctx = applicationContext
 
-        // لو في مكالمة → أجّل الذكر 5 دقايق وامشي
-          if (isCallActive() || isAudioBusy() || isInCommunication()) {
-            scheduleNext(this)
-            stopSelf()
-            return START_NOT_STICKY
-        }
+       // لو في مكالمة → أجل الذكر 5 دقايق وامشي
+val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+if (tm.callState != TelephonyManager.CALL_STATE_IDLE) {
+    ZekrScheduler.schedule(ctx, 5)
+    stopSelf()
+    return START_NOT_STICKY
+}
         
         // لو الأذان شغال → أجّل الذكر 5 دقايق وامشي
         if (AzanMediaPlayer.player?.isPlaying == true) {
