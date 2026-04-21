@@ -665,7 +665,6 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
             // App Info
             item {
                 SettingsCard(
