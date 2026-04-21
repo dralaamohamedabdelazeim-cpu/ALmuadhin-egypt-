@@ -644,9 +644,7 @@ fun SettingsScreen(
                             }
                         }
 
-                        Spacer(Modifier.height(12.dp))
-
-                         Text("🔊 مستوى الصوت", color = Color.White, fontSize = 14.sp)
+                        Text("🔊 مستوى الصوت", color = Color.White, fontSize = 14.sp)
                         Text("${(zekrVolume * 100).toInt()}%", color = gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
 
@@ -666,6 +664,8 @@ fun SettingsScreen(
                     )
                 }
             }
+
+            Spacer(Modifier.height(16.dp))
             // App Info
             item {
                 SettingsCard(
