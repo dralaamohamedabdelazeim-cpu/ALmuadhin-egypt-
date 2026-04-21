@@ -646,30 +646,26 @@ fun SettingsScreen(
 
                         Spacer(Modifier.height(12.dp))
 
-                        Text("مستوى الصوت 🔊", style = MaterialTheme.typography.bodySmall)
-                        Slider(
-                            value = zekrVolume,
-                            onValueChange = { newVal ->
-                                zekrVolume = newVal
-                                ZekrPrefs.setVolume(zekrCtx, newVal)
-                       
-                            },
-                            valueRange = 0f..1f,
-                            colors = SliderDefaults.colors(
-                                thumbColor = MaterialTheme.colorScheme.primary,
-                                activeTrackColor = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                        Text(
-                            "${(zekrVolume * 100).toInt()}%",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
+                         Text("🔊 مستوى الصوت", color = Color.White, fontSize = 14.sp)
+                        Text("${(zekrVolume * 100).toInt()}%", color = gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
+
+                    Slider(
+                        value = zekrVolume,
+                        onValueChange = { newVal ->
+                            zekrVolume = newVal
+                            ZekrPrefs.setVolume(ctx, newVal)
+                        },
+                        valueRange = 0f..1f,
+                        colors = SliderDefaults.colors(
+                            thumbColor = gold,
+                            activeTrackColor = gold,
+                            inactiveTrackColor = Color(0xFF2E4A2E)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
-
             // App Info
             item {
                 SettingsCard(
