@@ -89,10 +89,6 @@ class ZekrService : Service() {
         val playbackMode = ZekrPrefs.getPlaybackMode(ctx)
         val volumeFraction = ZekrPrefs.getVolume(ctx)
 
-        // تحويل logarithmic عشان الفرق يبقى واضح
-        val logVolume = if (volumeFraction <= 0f) 0f
-                        else (1 - kotlin.math.ln(1 + (1 - volumeFraction) * 99) / kotlin.math.ln(100f)).toFloat()
-
         val resId = if (playbackMode == 1) {
             val repeatIndex = ZekrPrefs.getRepeatIndex(ctx)
             if (repeatIndex < ZekrData.zekrList.size)
@@ -113,7 +109,7 @@ class ZekrService : Service() {
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                         .build()
                 )
-                setVolume(logVolume, logVolume)
+                setVolume(volumeFraction, volumeFraction)
                 setOnCompletionListener {
                     it.release()
                     mediaPlayer = null
