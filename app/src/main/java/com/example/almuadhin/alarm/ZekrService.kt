@@ -7,6 +7,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
@@ -14,7 +15,6 @@ import android.telephony.TelephonyManager
 import com.example.almuadhin.R
 import com.example.almuadhin.data.ZekrData
 import com.example.almuadhin.data.ZekrPrefs
-import kotlin.math.pow
 
 class ZekrService : Service() {
 
@@ -34,17 +34,16 @@ class ZekrService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val ctx = applicationContext
+        val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-       // لو في مكالمة عادية أو نت → أجل الذكر 5 دقايق وامشي
-val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-val am = getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
-if (tm.callState != TelephonyManager.CALL_STATE_IDLE || am.mode == android.media.AudioManager.MODE_IN_COMMUNICATION) {
-    ZekrScheduler.schedule(ctx, 5)
-    stopSelf()
-    return START_NOT_STICKY
-}
-        
-        // لو الأذان شغال → أجّل الذكر 5 دقايق وامشي
+        if (tm.callState != TelephonyManager.CALL_STATE_IDLE ||
+            am.mode == AudioManager.MODE_IN_COMMUNICATION) {
+            ZekrScheduler.schedule(ctx, 5)
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         if (AzanMediaPlayer.player?.isPlaying == true) {
             ZekrScheduler.schedule(ctx, 5)
             stopSelf()
@@ -90,6 +89,10 @@ if (tm.callState != TelephonyManager.CALL_STATE_IDLE || am.mode == android.media
         val playbackMode = ZekrPrefs.getPlaybackMode(ctx)
         val volumeFraction = ZekrPrefs.getVolume(ctx)
 
+        // تحويل logarithmic عشان الفرق يبقى واضح
+        val logVolume = if (volumeFraction <= 0f) 0f
+                        else (1 - kotlin.math.ln(1 + (1 - volumeFraction) * 99) / kotlin.math.ln(100f)).toFloat()
+
         val resId = if (playbackMode == 1) {
             val repeatIndex = ZekrPrefs.getRepeatIndex(ctx)
             if (repeatIndex < ZekrData.zekrList.size)
@@ -110,7 +113,7 @@ if (tm.callState != TelephonyManager.CALL_STATE_IDLE || am.mode == android.media
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                         .build()
                 )
-                setVolume(volumeFraction, volumeFraction)
+                setVolume(logVolume, logVolume)
                 setOnCompletionListener {
                     it.release()
                     mediaPlayer = null
